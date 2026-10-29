@@ -1,0 +1,38 @@
+.ae-types {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+.ae-type {
+  border: 2rpx solid #eef0f4;
+  border-radius: 14rpx;
+  padding: 20rpx;
+}
+.ae-type.on {
+  border-color: #2e6be6;
+  background: #f7faff;
+}
+.ae-type-label {
+  font-size: 28rpx;
+  font-weight: 500;
+  margin-bottom: 4rpx;
+}
+.chips .field-error {
+  border: 2rpx solid #e5484d;
+}
+.ae-parts {
+  min-height: 72rpx;
+  align-items: center;
+}
+.ae-part-popup {
+  height: 80vh;
+  display: flex;
+  flex-direction: column;
+}
+.ae-part-tree {
+  flex: 1;
+  min-height: 0;
+  border: 1rpx solid #eef0f4;
+  border-radius: 12rpx;
+  overflow: hidden;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "record",
+  "version": "1.0.0",
+  "description": "训练记录：整日保存/获取/月历/最近一次/删除",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

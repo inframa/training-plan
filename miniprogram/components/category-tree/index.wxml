@@ -1,0 +1,29 @@
+<scroll-view scroll-y class="ctree-scroll">
+  <view
+    wx:for="{{rows}}"
+    wx:key="path"
+    class="ctree-row {{item.selected ? 'is-selected' : ''}}"
+    style="padding-left: {{12 + item.depth * 18}}rpx"
+    data-path="{{item.path}}"
+    data-label="{{item.label}}"
+    bindtap="onTap"
+    bindlongpress="onLongPress"
+  >
+    <text class="ctree-label">{{item.label}}</text>
+    <text
+      wx:if="{{item.hasChildren}}"
+      class="ctree-arrow"
+      catchtap="onArrow"
+      data-path="{{item.path}}"
+    >{{item.expanded ? '▾' : '▸'}}</text>
+    <view wx:if="{{managing}}" class="ctree-ops" catchtap="noop">
+      <text class="ctree-op add" catchtap="onAddChild" data-path="{{item.path}}">＋</text>
+      <text class="ctree-op del" catchtap="onDelete" data-path="{{item.path}}" data-label="{{item.label}}">×</text>
+    </view>
+  </view>
+</scroll-view>
+<view wx:if="{{editable}}" class="ctree-foot">
+  <text class="ctree-foot-btn" bindtap="onAddTop">＋顶级</text>
+  <text class="ctree-foot-btn primary" bindtap="onToggleManage">{{managing ? '完成' : '管理'}}</text>
+  <text class="ctree-foot-btn" bindtap="onReset">恢复默认</text>
+</view>

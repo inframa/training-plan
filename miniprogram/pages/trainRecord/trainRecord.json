@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "训练记录",
+  "usingComponents": {
+    "set-row": "/components/set-row/index",
+    "action-card": "/components/action-card/index",
+    "save-status-bar": "/components/save-status-bar/index",
+    "calculator": "/components/calculator/index",
+    "category-tree": "/components/category-tree/index"
+  }
+}

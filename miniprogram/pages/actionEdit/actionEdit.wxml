@@ -1,0 +1,78 @@
+<view class="page ae">
+  <!-- 图片 -->
+  <view class="card">
+    <view class="field-label">动作图片（最多 3 张，第一张为缩略图）</view>
+    <image-picker images="{{images}}" max="{{3}}" bind:add="onImagesAdd" bind:remove="onImagesRemove" bind:retry="onImagesRetry" />
+  </view>
+
+  <!-- 必填字段 -->
+  <view class="card">
+    <view class="field">
+      <view class="field-label">动作名称（必填）</view>
+      <input class="input {{errors.name ? 'field-error' : ''}}" placeholder="如：高位下拉" value="{{form.name}}" data-field="name" bindinput="onField" />
+    </view>
+    <view class="field">
+      <view class="field-label">训练部位（必填，可多选）</view>
+      <view class="chips ae-parts {{errors.bodyParts ? 'field-error' : ''}}" bindtap="openPartPicker">
+        <text class="muted" wx:if="{{!form.bodyParts.length}}">点击选择部位（竖排分类树）</text>
+        <view class="chip on" wx:for="{{form.bodyParts}}" wx:key="*this">{{item}}</view>
+      </view>
+    </view>
+    <view class="field">
+      <view class="field-label">记录类型（必填）</view>
+      <view class="ae-types">
+        <view class="ae-type {{form.recordType === item.value ? 'on' : ''}}" wx:for="{{recordTypes}}" wx:key="value" data-type="{{item.value}}" bindtap="onRecordType">
+          <view class="ae-type-label">{{item.label}}</view>
+          <view class="muted">{{item.desc}}</view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 器械信息 -->
+  <view class="card">
+    <view class="h2" style="margin-bottom: 20rpx">器械信息（选填）</view>
+    <view class="field">
+      <view class="field-label">所属健身房</view>
+      <input class="input" placeholder="如：威尔仕" value="{{form.gym}}" data-field="gym" bindinput="onField" />
+    </view>
+    <view class="field">
+      <view class="field-label">把手类型（默认，可在记录中按次调整）</view>
+      <input class="input" placeholder="如：V把 / 直杆" value="{{form.handleType}}" data-field="handleType" bindinput="onField" />
+    </view>
+    <view class="field">
+      <view class="field-label">默认座椅档位</view>
+      <input class="input" placeholder="如：3档；无座椅可不填" value="{{form.defaultSeat}}" data-field="defaultSeat" bindinput="onField" />
+    </view>
+    <view class="field">
+      <view class="field-label">其他器械设置</view>
+      <input class="input" placeholder="如：靠背角度2" value="{{form.otherSettings}}" data-field="otherSettings" bindinput="onField" />
+    </view>
+    <view class="field" style="margin-bottom: 0">
+      <view class="field-label">动作备注</view>
+      <input class="input" placeholder="动作要点、注意事项" value="{{form.remark}}" data-field="remark" bindinput="onField" />
+    </view>
+  </view>
+
+  <view class="btn {{saving ? 'disabled' : ''}}" bindtap="onSave">保存</view>
+
+  <!-- 训练部位分类树弹层（多选） -->
+  <view class="mask" wx:if="{{partPickerVisible}}" bindtap="closePartPicker"></view>
+  <view class="popup ae-part-popup" wx:if="{{partPickerVisible}}">
+    <view class="row between" style="margin-bottom: 16rpx">
+      <view class="h2">选择训练部位</view>
+      <text class="link" bindtap="closePartPicker">完成</text>
+    </view>
+    <view class="muted" style="margin-bottom: 12rpx">已选：{{form.bodyParts.length ? form.bodyParts : '无'}}</view>
+    <view class="ae-part-tree">
+      <category-tree
+        tree="{{partTree}}"
+        selected-list="{{form.bodyParts}}"
+        multi="{{true}}"
+        editable
+        bind:select="onPartTreeToggle"
+        bind:change="onPartTreeChange"
+      />
+    </view>
+  </view>
+</view>

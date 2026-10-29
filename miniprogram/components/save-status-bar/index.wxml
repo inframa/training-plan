@@ -1,0 +1,6 @@
+<view wx:if="{{status !== 'none'}}" class="ss ss-{{status}}">
+  <view class="dot"></view>
+  <text wx:if="{{status === 'saving'}}">保存中…</text>
+  <text wx:elif="{{status === 'saved'}}">已保存</text>
+  <text wx:else>保存失败，内容已留在本地，网络恢复后自动重试</text>
+</view>

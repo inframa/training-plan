@@ -1,0 +1,40 @@
+.ss {
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  font-size: 24rpx;
+  padding: 8rpx 4rpx;
+}
+.dot {
+  width: 14rpx;
+  height: 14rpx;
+  border-radius: 50%;
+}
+.ss-saving {
+  color: #8a9099;
+}
+.ss-saving .dot {
+  background: #8a9099;
+  animation: blink 1s infinite;
+}
+.ss-saved {
+  color: #2ea46b;
+}
+.ss-saved .dot {
+  background: #2ea46b;
+}
+.ss-error {
+  color: #e5484d;
+}
+.ss-error .dot {
+  background: #e5484d;
+}
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}

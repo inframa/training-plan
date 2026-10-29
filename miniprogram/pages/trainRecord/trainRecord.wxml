@@ -1,0 +1,158 @@
+<view class="page tr">
+  <save-status-bar status="{{saveStatus}}" />
+
+  <!-- 顶部信息区 -->
+  <view class="card">
+    <view class="row between">
+      <view class="h1">{{dateTitle}}{{date === today ? ' · 今天' : ''}}</view>
+      <text class="link danger" bindtap="onDeleteDay">删除整日</text>
+    </view>
+    <view class="tr-stats">
+      <view class="stat">
+        <view class="num">{{totalVolume}}</view>
+        <view class="muted">总容量 kg·次</view>
+      </view>
+      <view class="stat">
+        <view class="num">{{doneActionCount}}/{{dayActions.length}}</view>
+        <view class="muted">完成动作</view>
+      </view>
+      <view class="stat">
+        <view class="num">{{doneSetCount}}/{{totalSetCount}}</view>
+        <view class="muted">完成组数</view>
+      </view>
+    </view>
+    <view class="tr-hint" wx:if="{{uncountedHint}}">部分动作未计入总容量</view>
+  </view>
+
+  <!-- 训练标题与备注 -->
+  <view class="card">
+    <view class="field-label">训练标题（日历上会显示）</view>
+    <input class="input" style="margin-bottom: 20rpx" placeholder="如：推力日 / 腿日" value="{{title}}" bindinput="onTitleInput" />
+    <input class="input" placeholder="当日备注（可选）" value="{{remark}}" bindinput="onRemark" />
+  </view>
+
+  <!-- 动作列表 -->
+  <view class="card tr-action" wx:for="{{dayActions}}" wx:for-item="act" wx:for-index="ai" wx:key="id">
+    <view class="row">
+      <image wx:if="{{act.thumb}}" class="tr-thumb" src="{{act.thumb}}" mode="aspectFill" />
+      <view wx:else class="tr-thumb thumb-ph">无图</view>
+      <view class="flex1" style="margin-left: 16rpx; min-width: 0">
+        <view class="h2" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{act.snapshot.name}}</view>
+        <view class="muted" wx:if="{{act.snapshot.gym || act.snapshot.handleType}}">{{act.snapshot.gym}}{{act.snapshot.gym && act.snapshot.handleType ? ' · ' : ''}}{{act.snapshot.handleType}}</view>
+      </view>
+      <text class="op" data-ai="{{ai}}" bindtap="copyLast">复制上次</text>
+      <text class="op danger" data-ai="{{ai}}" bindtap="onRemoveAction">删除</text>
+    </view>
+
+    <!-- 座椅档位 / 把手类型 -->
+    <view class="row tr-seat">
+      <text class="muted">座椅档位</text>
+      <input class="input tr-seat-input" placeholder="不适用" value="{{act.seat}}" data-ai="{{ai}}" bindinput="onSeatInput" />
+      <text class="link" wx:if="{{act.seatChanged && act.actionId}}" data-ai="{{ai}}" bindtap="syncSeat">同步到动作库</text>
+    </view>
+    <view class="row tr-seat">
+      <text class="muted">把手类型</text>
+      <input class="input tr-seat-input" placeholder="如：V把 / 直杆" value="{{act.handleType}}" data-ai="{{ai}}" bindinput="onHandleInput" />
+      <text class="link" wx:if="{{act.handleChanged && act.actionId}}" data-ai="{{ai}}" bindtap="syncHandle">同步到动作库</text>
+    </view>
+
+    <!-- 训练组 -->
+    <view class="tr-sets">
+      <view wx:if="{{!act.sets.length}}" class="muted" style="padding: 16rpx 0">暂无训练组，点击下方按钮添加</view>
+      <set-row
+        wx:for="{{act.sets}}"
+        wx:for-item="set"
+        wx:for-index="si"
+        wx:key="id"
+        set="{{set}}"
+        type="{{act.snapshot.recordType}}"
+        data-ai="{{ai}}"
+        data-si="{{si}}"
+        bind:weighttap="onWeightTap"
+        bind:input="onSetInput"
+        bind:blur="onSetBlur"
+        bind:toggle="onSetToggle"
+        bind:remark="onSetRemark"
+        bind:copy="onSetCopy"
+        bind:remove="onSetRemove"
+      />
+    </view>
+
+    <view class="row tr-act-ops">
+      <text class="op2" data-ai="{{ai}}" bindtap="addSet">＋ 添加一组</text>
+      <text class="op2" data-ai="{{ai}}" bindtap="copyLastSet">复制上一组</text>
+      <text class="op2" data-ai="{{ai}}" bindtap="openBatch">批量建组</text>
+      <view class="flex1"></view>
+      <text class="muted">容量 {{act.volume}} kg·次</text>
+    </view>
+  </view>
+
+  <!-- 添加动作 -->
+  <view class="btn tr-add" bindtap="openPicker">＋ 添加动作</view>
+
+  <!-- 空态 -->
+  <view class="empty" wx:if="{{!dayActions.length}}">
+    <view class="empty-title">还没有添加动作</view>
+    <view class="muted">添加动作，开始记录</view>
+  </view>
+
+  <!-- 撤销删除条 -->
+  <view class="tr-undo" wx:if="{{undo}}">
+    <text>{{undoText}}</text>
+    <text class="link" bindtap="onUndo">撤销</text>
+  </view>
+
+  <!-- 动作选择弹层：左树右列表 -->
+  <view class="mask" wx:if="{{showPicker}}" bindtap="closePicker"></view>
+  <view class="popup tr-picker" wx:if="{{showPicker}}" style="max-height: none">
+    <view class="row between" style="margin-bottom: 16rpx">
+      <view class="h2">选择动作</view>
+      <text class="link danger" bindtap="closePicker">关闭</text>
+    </view>
+    <input class="input" placeholder="搜索动作名称" value="{{pickerKeyword}}" bindinput="onPickerKeyword" />
+    <view class="tr-picker-body">
+      <view class="tr-picker-side">
+        <category-tree
+          tree="{{partTree}}"
+          selected="{{pickerPart}}"
+          all-label="全部"
+          editable
+          bind:select="onPickerTreeSelect"
+          bind:change="onPickerTreeChange"
+        />
+      </view>
+      <scroll-view scroll-y class="tr-picker-list">
+        <action-card wx:for="{{pickerList}}" wx:key="id" action="{{item}}" selected="{{pickerSelected[item.id]}}" bind:cardtap="onPickerTap" />
+        <view class="empty" wx:if="{{!pickerList.length}}">
+          <view class="muted">没有匹配的动作</view>
+        </view>
+      </scroll-view>
+    </view>
+    <view class="row tr-picker-footer">
+      <view class="btn plain flex1" bindtap="onCreateFromPicker">新建动作</view>
+      <view class="btn flex1" style="margin-left: 20rpx" bindtap="confirmPicker">添加已选</view>
+    </view>
+  </view>
+
+  <!-- 重量计算器 -->
+  <calculator visible="{{calcVisible}}" value="{{calcValue}}" title="输入重量（kg）" bind:confirm="onCalcConfirm" bind:close="onCalcClose" />
+
+  <!-- 批量建组弹层 -->
+  <view class="mask" wx:if="{{showBatch}}" bindtap="closeBatch"></view>
+  <view class="popup" wx:if="{{showBatch}}" style="max-height: none">
+    <view class="h2" style="margin-bottom: 24rpx">批量建组</view>
+    <view class="field">
+      <view class="field-label">组数（1-20）</view>
+      <input class="input" type="number" value="{{batchCount}}" bindinput="onBatchCount" />
+    </view>
+    <view class="field" wx:if="{{dayActions[batchAi] && dayActions[batchAi].snapshot.recordType === 'weight_reps'}}">
+      <view class="field-label">重量 kg（可留空，建组后点击各组重量用计算器填写）</view>
+      <input class="input" type="digit" value="{{batchWeight}}" bindinput="onBatchWeight" />
+    </view>
+    <view class="field">
+      <view class="field-label">次数（可留空稍后填写）</view>
+      <input class="input" type="number" value="{{batchReps}}" bindinput="onBatchReps" />
+    </view>
+    <view class="btn" bindtap="confirmBatch">创建</view>
+  </view>
+</view>

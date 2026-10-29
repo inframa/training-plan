@@ -1,0 +1,29 @@
+.ad-gallery {
+  margin-bottom: 24rpx;
+}
+.ad-type {
+  font-size: 22rpx;
+  color: #2e6be6;
+  background: #eef3ff;
+  border-radius: 8rpx;
+  padding: 6rpx 14rpx;
+  flex-shrink: 0;
+  margin-left: 16rpx;
+}
+.ad-tags {
+  flex-wrap: wrap;
+  gap: 12rpx;
+}
+.ad-field {
+  display: flex;
+  padding: 12rpx 0;
+  border-bottom: 1rpx solid #f0f1f5;
+  font-size: 26rpx;
+}
+.ad-field:last-child {
+  border-bottom: none;
+}
+.ad-btns {
+  display: flex;
+  gap: 20rpx;
+}

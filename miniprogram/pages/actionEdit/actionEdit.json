@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "编辑动作",
+  "usingComponents": {
+    "image-picker": "/components/image-picker/index",
+    "category-tree": "/components/category-tree/index"
+  }
+}

@@ -1,0 +1,29 @@
+<view class="page cal">
+  <view class="card cal-head">
+    <view class="row between">
+      <view class="arrow" bindtap="onPrevMonth">‹</view>
+      <view class="h1">{{title}}</view>
+      <view class="arrow" bindtap="onNextMonth">›</view>
+    </view>
+    <view class="row cal-meta">
+      <text class="muted">已训练 {{monthMeta.trained}} 天</text>
+      <text class="muted" wx:if="{{monthMeta.draft}}"> · 草稿 {{monthMeta.draft}} 天</text>
+      <view class="flex1"></view>
+      <text class="link" bindtap="onGoToday">回到今天</text>
+    </view>
+    <calendar-grid
+      year="{{year}}"
+      month="{{month}}"
+      marks="{{marks}}"
+      selected="{{selected}}"
+      today="{{today}}"
+      bind:select="onSelect"
+      bind:futuretap="onFutureTap"
+    />
+    <view class="cal-legend">
+      <view class="lg"><view class="dot blue"></view>已训练</view>
+      <view class="lg"><view class="dot orange"></view>草稿</view>
+      <view class="lg muted">点击日期查看 / 补录训练</view>
+    </view>
+  </view>
+</view>

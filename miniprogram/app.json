@@ -1,0 +1,39 @@
+{
+  "pages": [
+    "pages/calendar/calendar",
+    "pages/actionLibrary/actionLibrary",
+    "pages/trainRecord/trainRecord",
+    "pages/actionEdit/actionEdit",
+    "pages/actionDetail/actionDetail"
+  ],
+  "window": {
+    "backgroundColor": "#F5F6FA",
+    "backgroundTextStyle": "light",
+    "navigationBarBackgroundColor": "#FFFFFF",
+    "navigationBarTitleText": "健身容量记录",
+    "navigationBarTextStyle": "black"
+  },
+  "tabBar": {
+    "color": "#9AA3AE",
+    "selectedColor": "#2E6BE6",
+    "backgroundColor": "#FFFFFF",
+    "borderStyle": "white",
+    "list": [
+      {
+        "pagePath": "pages/calendar/calendar",
+        "text": "训练日历",
+        "iconPath": "images/tab/calendar.png",
+        "selectedIconPath": "images/tab/calendar-active.png"
+      },
+      {
+        "pagePath": "pages/actionLibrary/actionLibrary",
+        "text": "动作库",
+        "iconPath": "images/tab/library.png",
+        "selectedIconPath": "images/tab/library-active.png"
+      }
+    ]
+  },
+  "sitemapLocation": "sitemap.json",
+  "style": "v2",
+  "lazyCodeLoading": "requiredComponents"
+}

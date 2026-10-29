@@ -1,0 +1,54 @@
+<view class="page ad" wx:if="{{action}}">
+  <!-- 图片 -->
+  <view class="ad-gallery" wx:if="{{viewUrls.length}}" bindtap="onPreview">
+    <swiper display-multiple-items="{{3}}" style="height: 220rpx">
+      <swiper-item wx:for="{{viewUrls}}" wx:key="*this">
+        <image src="{{item}}" mode="aspectFill" style="width: 100%; height: 220rpx; border-radius: 12rpx" />
+      </swiper-item>
+    </swiper>
+  </view>
+
+  <!-- 基本信息 -->
+  <view class="card">
+    <view class="row between">
+      <view class="h1 flex1">{{action.name}}</view>
+      <view class="ad-type">{{typeLabel}}</view>
+    </view>
+    <view class="row ad-tags" style="margin-top: 16rpx">
+      <view class="chip" wx:for="{{action.bodyParts}}" wx:key="*this">{{item}}</view>
+    </view>
+    <view class="muted" style="margin-top: 16rpx" wx:if="{{action.archived}}">已归档：默认列表中隐藏，可随时恢复</view>
+  </view>
+
+  <!-- 器械信息 -->
+  <view class="card" wx:if="{{fields.length}}">
+    <view class="h2" style="margin-bottom: 12rpx">器械信息</view>
+    <view class="ad-field" wx:for="{{fields}}" wx:key="index">
+      <text class="muted">{{item[0]}}</text>
+      <text class="flex1" style="margin-left: 24rpx">{{item[1]}}</text>
+    </view>
+  </view>
+
+  <!-- 最近一次训练 -->
+  <view class="card">
+    <view class="h2" style="margin-bottom: 12rpx">最近一次训练</view>
+    <block wx:if="{{history}}">
+      <view class="muted">{{history.date}}</view>
+      <view style="margin-top: 8rpx">{{history.setsText || '（无完成组数据）'}}</view>
+      <view class="muted" style="margin-top: 8rpx" wx:if="{{history.volume}}">容量 {{history.volume}} kg·次</view>
+    </block>
+    <view class="muted" wx:else>暂无历史记录</view>
+  </view>
+
+  <!-- 操作 -->
+  <view class="ad-btns">
+    <view class="btn flex1" bindtap="onEdit">编辑</view>
+    <view class="btn plain flex1" bindtap="onCopy">复制</view>
+    <view class="btn plain flex1" bindtap="onArchive">{{action.archived ? '恢复' : '归档'}}</view>
+  </view>
+  <view class="btn-danger" style="margin-top: 24rpx" bindtap="onDelete">删除动作</view>
+</view>
+
+<view class="empty" wx:else>
+  <view class="empty-title">动作不存在或已删除</view>
+</view>

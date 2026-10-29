@@ -1,0 +1,89 @@
+/* 竖排多级分类树 */
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.ctree-scroll {
+  flex: 1;
+  min-height: 0;
+}
+
+.ctree-row {
+  display: flex;
+  align-items: center;
+  height: 76rpx;
+  padding-right: 8rpx;
+  border-left: 6rpx solid transparent;
+  font-size: 28rpx;
+  color: #333;
+}
+
+.ctree-row.is-selected {
+  border-left-color: #2E6BE6;
+  background: #EDF3FE;
+  color: #2E6BE6;
+  font-weight: 600;
+}
+
+.ctree-label {
+  flex: 1;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+.ctree-arrow {
+  flex-shrink: 0;
+  width: 40rpx;
+  text-align: center;
+  color: #9AA3AE;
+  font-size: 24rpx;
+}
+
+.ctree-ops {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.ctree-op {
+  width: 48rpx;
+  height: 48rpx;
+  line-height: 44rpx;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 30rpx;
+}
+
+.ctree-op.add {
+  color: #2E6BE6;
+  background: #EDF3FE;
+}
+
+.ctree-op.del {
+  color: #E5484D;
+  background: #FDECEC;
+}
+
+.ctree-foot {
+  flex-shrink: 0;
+  display: flex;
+  border-top: 1rpx solid #EEF0F4;
+  background: #FAFBFC;
+}
+
+.ctree-foot-btn {
+  flex: 1;
+  padding: 16rpx 0;
+  text-align: center;
+  font-size: 24rpx;
+  color: #666;
+}
+
+.ctree-foot-btn.primary {
+  color: #2E6BE6;
+  font-weight: 600;
+}

@@ -1,0 +1,9 @@
+{
+  "name": "action",
+  "version": "1.0.0",
+  "description": "动作库：列表/详情/增改/复制/归档/删除",
+  "main": "index.js",
+  "dependencies": {
+    "wx-server-sdk": "~2.6.3"
+  }
+}

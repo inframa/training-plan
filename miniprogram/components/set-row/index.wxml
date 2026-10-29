@@ -1,0 +1,18 @@
+<view class="sr {{set.done ? 'sr-done' : ''}}">
+  <view class="sr-idx">{{set.setIndex}}</view>
+  <view class="sr-inputs">
+    <view
+      wx:if="{{type === 'weight_reps'}}"
+      class="sr-input w {{set.weight ? '' : 'ph'}}"
+      bindtap="onWeightTap"
+    >{{set.weight || '重量kg'}}</view>
+    <input class="sr-input" type="number" placeholder="次数" value="{{set.reps}}" bindinput="onReps" bindblur="onRepsBlur" />
+  </view>
+  <view class="sr-done {{set.done ? 'on' : ''}}" bindtap="onToggle">{{set.done ? '已完成' : '完成'}}</view>
+  <view class="sr-ops">
+    <text class="op" catchtap="onRemark">备注</text>
+    <text class="op" catchtap="onCopy">复制</text>
+    <text class="op danger" catchtap="onRemove">删除</text>
+  </view>
+  <view class="sr-remark" wx:if="{{set.remark}}">{{set.remark}}</view>
+</view>

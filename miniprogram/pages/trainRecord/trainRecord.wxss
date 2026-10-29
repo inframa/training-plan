@@ -1,0 +1,103 @@
+.tr-stats {
+  display: flex;
+  margin-top: 24rpx;
+}
+.stat {
+  flex: 1;
+  text-align: center;
+}
+.tr-hint {
+  margin-top: 16rpx;
+  font-size: 24rpx;
+  color: #e6912e;
+  background: #fdf6ec;
+  border-radius: 10rpx;
+  padding: 10rpx 20rpx;
+}
+.tr-thumb {
+  width: 72rpx;
+  height: 72rpx;
+  border-radius: 12rpx;
+  flex-shrink: 0;
+  font-size: 20rpx;
+}
+.op {
+  font-size: 24rpx;
+  color: #2e6be6;
+  margin-left: 24rpx;
+  flex-shrink: 0;
+}
+.op.danger {
+  color: #e5484d;
+}
+.op2 {
+  font-size: 26rpx;
+  color: #2e6be6;
+  margin-right: 32rpx;
+}
+.tr-seat {
+  gap: 16rpx;
+  margin-top: 20rpx;
+}
+.tr-seat-input {
+  flex: 1;
+  min-width: 0;
+  padding: 10rpx 16rpx;
+}
+.tr-sets {
+  margin-top: 8rpx;
+}
+.tr-act-ops {
+  margin-top: 16rpx;
+  padding-top: 16rpx;
+  border-top: 1rpx solid #f0f1f5;
+}
+.tr-add {
+  margin-top: 8rpx;
+}
+.tr-undo {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: 120rpx;
+  background: rgba(31, 35, 41, 0.85);
+  color: #fff;
+  font-size: 26rpx;
+  padding: 16rpx 32rpx;
+  border-radius: 999rpx;
+  display: flex;
+  gap: 24rpx;
+  z-index: 90;
+}
+.tr-picker {
+  height: 85vh;
+  display: flex;
+  flex-direction: column;
+}
+.tr-picker-body {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  margin-top: 20rpx;
+  border: 1rpx solid #eef0f4;
+  border-radius: 12rpx;
+  overflow: hidden;
+}
+.tr-picker-side {
+  width: 200rpx;
+  flex-shrink: 0;
+  height: 100%;
+  background: #fafbfc;
+  border-right: 1rpx solid #eef0f4;
+}
+.tr-picker-list {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding: 12rpx;
+  box-sizing: border-box;
+}
+.tr-picker-footer {
+  margin-top: 20rpx;
+  gap: 0;
+}

@@ -1,0 +1,22 @@
+<view class="cg">
+  <view class="cg-head">
+    <view class="cg-wk" wx:for="{{WEEK}}" wx:key="*this">{{item}}</view>
+  </view>
+  <view class="cg-row" wx:for="{{weeks}}" wx:for-item="week" wx:key="idx">
+    <view
+      wx:for="{{week.cells}}"
+      wx:for-item="cell"
+      wx:key="date"
+      class="cg-cell {{cell.isFuture ? 'future' : ''}} {{cell.isSelected ? 'selected' : ''}}"
+      data-date="{{cell.date}}"
+      data-future="{{cell.isFuture}}"
+      bindtap="onTap"
+    >
+      <view class="cg-day {{cell.isToday ? 'today' : ''}}">{{cell.day}}</view>
+      <block wx:if="{{cell.hasMark}}">
+        <view class="cg-dot {{cell.trained ? 'trained' : ''}}"></view>
+        <view class="cg-info" wx:if="{{cell.info}}">{{cell.info}}</view>
+      </block>
+    </view>
+  </view>
+</view>

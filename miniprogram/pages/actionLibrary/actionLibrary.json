@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "动作库",
+  "usingComponents": {
+    "action-card": "/components/action-card/index",
+    "category-tree": "/components/category-tree/index"
+  }
+}

@@ -1,0 +1,21 @@
+<view class="ip">
+  <view class="ip-item" wx:for="{{images}}" wx:key="index">
+    <image
+      wx:if="{{item.status === 'done' || item.status === 'uploading'}}"
+      class="ip-img"
+      src="{{item.tempPath || item.viewUrl || item.fileID}}"
+      mode="aspectFill"
+      data-index="{{index}}"
+      bindtap="onPreview"
+    />
+    <view wx:else class="ip-img thumb-ph" data-index="{{index}}" bindtap="onRetry">已失败</view>
+    <view wx:if="{{item.status === 'uploading'}}" class="ip-mask">
+      <view class="spinner"></view>
+    </view>
+    <view wx:elif="{{item.status === 'error'}}" class="ip-mask">
+      <text class="ip-retry" data-index="{{index}}" catchtap="onRetry">重试</text>
+    </view>
+    <view class="ip-del" data-index="{{index}}" catchtap="onRemove">×</view>
+  </view>
+  <view class="ip-item ip-add" wx:if="{{images.length < max}}" bindtap="onAdd">＋</view>
+</view>

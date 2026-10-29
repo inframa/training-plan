@@ -1,0 +1,32 @@
+<view class="calc-mask" wx:if="{{visible}}" bindtap="onClose"></view>
+<view class="calc-panel" wx:if="{{visible}}" catchtap="noop">
+  <view class="calc-head">
+    <text class="calc-title">{{title}}</text>
+    <text class="calc-close" bindtap="onClose">关闭</text>
+  </view>
+  <view class="calc-display">
+    <view class="calc-expr">{{expr || '0'}}</view>
+    <view class="calc-preview" wx:if="{{preview}}">= {{preview}}</view>
+  </view>
+  <view class="calc-grid">
+    <view class="calc-key fn" data-key="C" bindtap="onKey">C</view>
+    <view class="calc-key fn" data-key="back" bindtap="onKey">⌫</view>
+    <view class="calc-key fn" data-key="/" bindtap="onKey">÷</view>
+    <view class="calc-key fn" data-key="*" bindtap="onKey">×</view>
+    <view class="calc-key" data-key="7" bindtap="onKey">7</view>
+    <view class="calc-key" data-key="8" bindtap="onKey">8</view>
+    <view class="calc-key" data-key="9" bindtap="onKey">9</view>
+    <view class="calc-key fn" data-key="-" bindtap="onKey">−</view>
+    <view class="calc-key" data-key="4" bindtap="onKey">4</view>
+    <view class="calc-key" data-key="5" bindtap="onKey">5</view>
+    <view class="calc-key" data-key="6" bindtap="onKey">6</view>
+    <view class="calc-key fn" data-key="+" bindtap="onKey">＋</view>
+    <view class="calc-key" data-key="1" bindtap="onKey">1</view>
+    <view class="calc-key" data-key="2" bindtap="onKey">2</view>
+    <view class="calc-key" data-key="3" bindtap="onKey">3</view>
+    <view class="calc-key eq" data-key="=" bindtap="onEq">=</view>
+    <view class="calc-key wide" data-key="0" bindtap="onKey">0</view>
+    <view class="calc-key" data-key="." bindtap="onKey">.</view>
+    <view class="calc-key ok" bindtap="onConfirm">确认</view>
+  </view>
+</view>

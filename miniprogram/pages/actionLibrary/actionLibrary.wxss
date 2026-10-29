@@ -1,0 +1,73 @@
+/* 左树右列表布局 */
+.lib-h {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  padding: 0;
+}
+.lib-side {
+  width: 176rpx;
+  flex-shrink: 0;
+  height: 100%;
+  background: #fff;
+  border-right: 1rpx solid #eef0f4;
+}
+.lib-main {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  overflow-y: auto;
+  padding: 20rpx 20rpx 160rpx;
+  box-sizing: border-box;
+}
+.lib-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-bottom: 20rpx;
+}
+.lib-clear {
+  color: #8a9099;
+  font-size: 24rpx;
+}
+.lib-switch {
+  gap: 4rpx;
+  transform: scale(0.8);
+}
+.fab-in-main {
+  right: 40rpx;
+  bottom: 60rpx;
+}
+.lib-item {
+  padding: 4rpx 0 8rpx;
+  border-bottom: 1rpx solid #f0f1f5;
+}
+.lib-item:last-child {
+  border-bottom: none;
+}
+.lib-ops {
+  display: flex;
+  gap: 36rpx;
+  padding: 8rpx 16rpx 16rpx 132rpx;
+}
+.op {
+  font-size: 24rpx;
+  color: #2e6be6;
+}
+.op.danger {
+  color: #e5484d;
+}
+.lib-create {
+  margin-top: 32rpx;
+  width: 400rpx;
+  display: inline-block;
+}
+.lib-gym {
+  padding: 24rpx 16rpx;
+  border-bottom: 1rpx solid #f0f1f5;
+  font-size: 28rpx;
+}
+.lib-gym.on {
+  color: #2e6be6;
+  font-weight: 500;
+}

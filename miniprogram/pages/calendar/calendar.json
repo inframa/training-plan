@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "训练日历",
+  "usingComponents": {
+    "calendar-grid": "/components/calendar-grid/index"
+  }
+}

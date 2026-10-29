@@ -1,0 +1,60 @@
+<view class="page lib lib-h">
+  <!-- 左侧竖排分类树 -->
+  <view class="lib-side">
+    <category-tree
+      tree="{{partTree}}"
+      selected="{{part}}"
+      all-label="全部"
+      editable
+      bind:select="onTreeSelect"
+      bind:change="onTreeChange"
+      bind:reset="onTreeReset"
+    />
+  </view>
+
+  <!-- 右侧列表区 -->
+  <view class="lib-main">
+    <view class="lib-filter-bar">
+      <input class="input flex1" placeholder="搜索动作名称" value="{{keyword}}" bindinput="onKeyword" confirm-type="search" />
+      <text class="lib-clear" wx:if="{{keyword}}" bindtap="onClearKeyword">清除</text>
+      <text class="link" bindtap="onOpenGymSheet">{{gym ? gym : '健身房'}}</text>
+      <view class="row lib-switch">
+        <text class="muted">归档</text>
+        <switch checked="{{showArchived}}" bindchange="onToggleArchived" color="#2E6BE6" />
+      </view>
+    </view>
+
+    <!-- 动作列表 -->
+    <view class="card" wx:if="{{list.length}}">
+      <view class="lib-item" wx:for="{{list}}" wx:key="id">
+        <action-card action="{{item}}" bind:cardtap="onDetail" />
+        <view class="lib-ops">
+          <text class="op" data-id="{{item.id}}" catchtap="onEdit">编辑</text>
+          <text class="op" data-id="{{item.id}}" catchtap="onCopy">复制</text>
+          <text class="op" data-id="{{item.id}}" catchtap="onArchive">{{item.archived ? '恢复' : '归档'}}</text>
+          <text class="op danger" data-id="{{item.id}}" catchtap="onDelete">删除</text>
+        </view>
+      </view>
+    </view>
+
+    <!-- 空态 -->
+    <view class="empty" wx:if="{{loaded && !list.length}}">
+      <view class="empty-title">{{keyword || part || gym ? '没有匹配的动作' : showArchived ? '暂无归档动作' : '动作库还是空的'}}</view>
+      <view class="muted" wx:if="{{!keyword && !part && !gym && !showArchived}}">创建你的第一个动作，开始记录训练</view>
+      <view class="btn lib-create" wx:if="{{!showArchived}}" bindtap="onCreate">创建第一个动作</view>
+    </view>
+  </view>
+
+  <view class="fab fab-in-main" bindtap="onCreate">＋</view>
+
+  <!-- 健身房筛选 -->
+  <view class="mask" wx:if="{{gymSheetVisible}}" bindtap="onCloseGymSheet"></view>
+  <view class="popup" wx:if="{{gymSheetVisible}}">
+    <view class="h2" style="margin-bottom: 20rpx">选择健身房</view>
+    <scroll-view scroll-y style="max-height: 50vh">
+      <view class="lib-gym {{gym === '' ? 'on' : ''}}" data-gym="" bindtap="onPickGym">全部</view>
+      <view class="lib-gym {{gym === item ? 'on' : ''}}" wx:for="{{gyms}}" wx:key="*this" data-gym="{{item}}" bindtap="onPickGym">{{item}}</view>
+      <view class="muted" wx:if="{{!gyms.length}}" style="padding: 30rpx 0">暂无健身房信息，可在动作编辑页填写</view>
+    </scroll-view>
+  </view>
+</view>
