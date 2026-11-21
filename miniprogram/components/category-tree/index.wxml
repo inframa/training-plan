@@ -9,28 +9,47 @@
     wx:for="{{rows}}"
     wx:key="path"
     wx:for-index="idx"
-    class="ctree-row {{item.selected ? 'is-selected' : ''}} {{dragging && dragPath === item.path ? 'is-dragging' : ''}} {{dragging && targetIdx === idx && dragPath !== item.path ? 'is-target' : ''}}"
+    class="ctree-row {{item.path === '__all__' ? 'is-all' : ''}} {{item.path === '__add_top__' ? 'is-add' : ''}} {{item.selected ? 'is-selected' : ''}} {{dragging && dragPath === item.path ? 'is-dragging' : ''}} {{dragging && targetIdx === idx && dragPath !== item.path ? 'is-target' : ''}}"
     style="padding-left: {{12 + item.depth * 18}}rpx"
     data-path="{{item.path}}"
     data-label="{{item.label}}"
     data-idx="{{idx}}"
     bindtap="onTap"
-    bindlongpress="onLongPress"
     hover-class="ctree-row-hover"
   >
-    <text
-      wx:if="{{item.hasChildren}}"
-      class="ctree-arrow"
-      catchtap="onArrow"
-      data-path="{{item.path}}"
-    >{{item.expanded ? '▾' : '▸'}}</text>
-    <text wx:else class="ctree-arrow ctree-arrow-placeholder"></text>
-    <text class="ctree-label">{{item.label}}</text>
-    <view wx:if="{{managing}}" class="ctree-ops" catchtap="noop">
-      <text class="ctree-op drag-handle" catchtouchstart="onDragStart" data-path="{{item.path}}" data-label="{{item.label}}" data-idx="{{idx}}">≡</text>
-      <text class="ctree-op add" catchtap="onAddChild" data-path="{{item.path}}">＋</text>
-      <text class="ctree-op del" catchtap="onDelete" data-path="{{item.path}}" data-label="{{item.label}}">×</text>
-    </view>
+    <!-- 添加顶级（管理模式末尾） -->
+    <block wx:if="{{item.path === '__add_top__'}}">
+      <text class="ctree-add-top-label">＋ 添加顶级分类</text>
+    </block>
+
+    <!-- 「全部」行：只渲染箭头+label，不渲染管理按钮 -->
+    <block wx:elif="{{item.path === '__all__'}}">
+      <text
+        wx:if="{{item.hasChildren}}"
+        class="ctree-arrow ctree-arrow-all"
+        catchtap="onArrow"
+        data-path="{{item.path}}"
+      >{{item.expanded ? '▾' : '▸'}}</text>
+      <text wx:else class="ctree-arrow ctree-arrow-placeholder"></text>
+      <text class="ctree-label">{{item.label}}</text>
+    </block>
+
+    <!-- 普通分类行 -->
+    <block wx:else>
+      <text
+        wx:if="{{item.hasChildren}}"
+        class="ctree-arrow"
+        catchtap="onArrow"
+        data-path="{{item.path}}"
+      >{{item.expanded ? '▾' : '▸'}}</text>
+      <text wx:else class="ctree-arrow ctree-arrow-placeholder"></text>
+      <text class="ctree-label">{{item.label}}</text>
+      <view wx:if="{{managing}}" class="ctree-ops" catchtap="noop">
+        <text class="ctree-op drag-handle" catchtouchstart="onDragStart" data-path="{{item.path}}" data-label="{{item.label}}" data-idx="{{idx}}">≡</text>
+        <text class="ctree-op add" catchtap="onAddChild" data-path="{{item.path}}">＋</text>
+        <text class="ctree-op del" catchtap="onDelete" data-path="{{item.path}}" data-label="{{item.label}}">×</text>
+      </view>
+    </block>
   </view>
 </scroll-view>
 <view wx:if="{{editable}}" class="ctree-foot">

@@ -33,6 +33,30 @@
   font-weight: 600;
 }
 
+/* 「全部」行视觉区分 */
+.ctree-row.is-all {
+  border-bottom: 1rpx solid #EEF0F4;
+  margin-bottom: 4rpx;
+  font-weight: 600;
+  color: #222;
+}
+
+.ctree-row.is-all .ctree-arrow-all {
+  color: #2E6BE6;
+}
+
+/* 「添加顶级」行 */
+.ctree-row.is-add {
+  justify-content: center;
+  height: 68rpx;
+  color: #2E6BE6;
+  font-size: 26rpx;
+}
+
+.ctree-row.is-add:active {
+  background: #EDF3FE;
+}
+
 .ctree-row.is-dragging {
   opacity: 0.35;
 }

@@ -61,14 +61,20 @@ Component({
         });
       };
       walk(tree, 0, '');
+      // 管理模式下末尾追加「添加顶级」
+      if (managing && !multi) {
+        rows.push({ path: '__add_top__', label: '＋ 添加顶级分类', special: 'add', depth: 0, hasChildren: false, expanded: false, selected: false });
+      }
       this.setData({ rows });
     },
 
     // ---------- 选择 ----------
     onTap(e) {
-      const { path } = e.currentTarget.dataset;
+      const { path, label } = e.currentTarget.dataset;
+      // 内部特殊路径不触发 select
+      if (path === '__add_top__') { this.onAddTop(); return; }
+      if (path === '__all__' && label === undefined) return;
       if (this.data.managing || this.data.dragging) return;
-      const { label } = e.currentTarget.dataset;
       if (!this.data.multi && this._exp && path !== '__all__') {
         if (this._exp[path] === undefined) this._exp[path] = true;
       }
@@ -120,7 +126,9 @@ Component({
     // ---------- 重命名 ----------
     onLongPress(e) {
       if (!this.data.editable || !this.data.managing || this.data.dragging) return;
-      const { path, label } = e.currentTarget.dataset;
+      const { path } = e.currentTarget.dataset;
+      if (path === '__all__' || path === '__add_top__') return;
+      const { label } = e.currentTarget.dataset;
       wx.showModal({
         title: '重命名分类',
         editable: true,
@@ -143,6 +151,7 @@ Component({
     // ---------- 添加 / 删除 ----------
     onAddChild(e) {
       const { path } = e.currentTarget.dataset;
+      if (path === '__all__' || path === '__add_top__') return;
       const self = this;
       wx.showModal({
         title: '添加子分类',
@@ -182,6 +191,7 @@ Component({
 
     onDelete(e) {
       const { path, label } = e.currentTarget.dataset;
+      if (path === '__all__' || path === '__add_top__') return;
       const self = this;
       wx.showModal({
         title: '删除分类',
@@ -226,6 +236,7 @@ Component({
     onDragStart(e) {
       if (!this.data.editable || !this.data.managing) return;
       const { path, idx } = e.currentTarget.dataset;
+      if (path === '__all__' || path === '__add_top__') return;
       wx.vibrateShort({ type: 'light' });
       // 一次性测量 scroll-view 顶部位置
       wx.createSelectorQuery().in(this)
