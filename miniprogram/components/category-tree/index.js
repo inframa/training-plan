@@ -200,20 +200,15 @@ Component({
       this._svScrollY = e.detail.scrollTop;
     },
 
-    onRowTouchStart(e) {
-      // 更新一下 scroll-view 顶部（用户可能滚动过）
-      wx.createSelectorQuery().in(this)
-        .select('.ctree-scroll').boundingClientRect((rect) => {
-          if (rect) this._svTop = rect.top;
-        }).exec();
-    },
-
-    onTouchStart() { /* 占位，scroll-view 的 touch 事件在这里兜底 */ },
-
     onDragStart(e) {
       if (!this.data.editable || !this.data.managing) return;
       const { path, idx } = e.currentTarget.dataset;
       wx.vibrateShort({ type: 'light' });
+      // 一次性测量 scroll-view 顶部位置
+      wx.createSelectorQuery().in(this)
+        .select('.ctree-scroll').boundingClientRect((rect) => {
+          if (rect) this._svTop = rect.top;
+        }).exec();
       this._drag = { path, startIdx: idx };
       this.setData({ dragging: true, dragPath: path, targetIdx: -1 });
     },

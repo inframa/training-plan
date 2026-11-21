@@ -2,7 +2,6 @@
   scroll-y="{{!dragging}}"
   class="ctree-scroll"
   bindscroll="onScroll"
-  bindtouchstart="onTouchStart"
   bindtouchmove="onTouchMove"
   bindtouchend="onTouchEnd"
 >
@@ -27,7 +26,6 @@
     data-idx="{{idx}}"
     bindtap="onTap"
     bindlongpress="onLongPress"
-    catchtouchstart="onRowTouchStart"
   >
     <text
       wx:if="{{item.hasChildren}}"
