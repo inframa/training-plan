@@ -33,11 +33,6 @@
   font-weight: 600;
 }
 
-.ctree-row.is-virtual {
-  /* 虚拟行：弱化视觉，跟子菜单同级 */
-  color: #666;
-}
-
 .ctree-row.is-dragging {
   opacity: 0.35;
 }
@@ -64,10 +59,6 @@
   text-overflow: ellipsis;
 }
 
-.muted {
-  color: #9AA3AE;
-}
-
 .ctree-arrow {
   flex-shrink: 0;
   width: 40rpx;
@@ -78,15 +69,6 @@
 
 .ctree-arrow-placeholder {
   visibility: hidden;
-}
-
-/* 内联折叠/展开图标：跟子菜单同一行内 */
-.ctree-icon-btn-inline {
-  flex-shrink: 0;
-  width: 40rpx;
-  text-align: center;
-  color: #2E6BE6;
-  font-size: 26rpx;
 }
 
 .ctree-ops {

@@ -43,9 +43,12 @@ Component({
       if (!this._exp) this._exp = {};
       const rows = [];
       if (!multi && allLabel) {
-        rows.push({ path: '__all__', label: allLabel, depth: 0, hasChildren: false, expanded: false, selected: selected === '' });
         const anyExpanded = this._hasAnyExpanded(tree);
-        rows.push({ path: '__toggle__', label: anyExpanded ? '全部折叠' : '全部展开', virtual: true, icon: anyExpanded ? '▼' : '▲', depth: 0, hasChildren: false, expanded: false, selected: false });
+        rows.push({
+          path: '__all__', label: allLabel, depth: 0,
+          hasChildren: true, expanded: anyExpanded,
+          selected: selected === ''
+        });
       }
       const walk = (nodes, depth, parentPath) => {
         (nodes || []).forEach((n) => {
@@ -65,8 +68,6 @@ Component({
     onTap(e) {
       const { path } = e.currentTarget.dataset;
       if (this.data.managing || this.data.dragging) return;
-      // 虚拟行不触发 select
-      if (path === '__toggle__') return;
       const { label } = e.currentTarget.dataset;
       if (!this.data.multi && this._exp && path !== '__all__') {
         if (this._exp[path] === undefined) this._exp[path] = true;
@@ -76,8 +77,14 @@ Component({
 
     onArrow(e) {
       const { path } = e.currentTarget.dataset;
-      this._exp[path] = !(this._exp[path] !== false);
-      this.rebuild();
+      if (path === '__all__') {
+        // 「全部」行箭头：循环切换所有子分类的折叠/展开
+        if (this._hasAnyExpanded(this.data.tree)) this.onCollapseAll();
+        else this.onExpandAll();
+      } else {
+        this._exp[path] = !(this._exp[path] !== false);
+        this.rebuild();
+      }
     },
 
     // ---------- 全部折叠 / 全部展开 ----------
@@ -99,15 +106,6 @@ Component({
     onExpandAll() {
       this.setAllExpanded(this.data.tree, true);
       this.rebuild();
-    },
-
-    // 虚拟行点击：单个按钮循环切换
-    onToggleVirtual(e) {
-      const { path } = e.currentTarget.dataset;
-      if (path === '__toggle__') {
-        if (this._hasAnyExpanded(this.data.tree)) this.onCollapseAll();
-        else this.onExpandAll();
-      }
     },
     setAllExpanded(nodes, val, parentPath) {
       (nodes || []).forEach((n) => {
