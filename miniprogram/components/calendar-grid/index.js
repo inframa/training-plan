@@ -36,7 +36,7 @@ Component({
           cells: cells.slice(i, i + 7).map((c) => {
             const mark = marks[c.date] || null;
             const title = (mark && mark.title) || '';
-            const volume = (mark && mark.volume) || 0;
+            const volume = mark ? (mark.volume || 0) : 0;
             return {
               date: c.date,
               day: parseInt(c.date.slice(8, 10), 10),
@@ -47,7 +47,7 @@ Component({
               hasMark: !!mark && c.inMonth,
               trained: !!mark && mark.status === 'trained',
               title,
-              volumeText: volume ? volume + ' kg·次' : ''
+              volumeText: mark ? volume + ' kg·次' : ''
             };
           })
         });
