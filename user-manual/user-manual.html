@@ -382,7 +382,7 @@
   <h1>健身容量记录</h1>
   <div class="divider"></div>
   <div class="subtitle">完整操作手册 · 用户端 &amp; 管理后台</div>
-  <div class="meta">v1.0 · 2026年11月</div>
+  <div class="meta">v1.1 · 2026年11月</div>
 </section>
 
 <div class="container">
@@ -616,6 +616,12 @@
     <li>可选填写邮箱/微信，方便开发者回复</li>
     <li>点 <b>提交反馈</b> — 下方「我的反馈历史」会显示所有提交记录和处理状态</li>
   </ol>
+
+  <div class="callout tip">
+    <strong>💡 查看管理员回复</strong>
+    打开「我的反馈历史」，如果管理员回复过你的反馈，会在反馈内容下方显示<mark class="ok">👨‍💼 管理员回复</mark>蓝色卡片，包含回复内容和回复时间。
+    管理员回复时会自动把反馈标记为「已处理」。
+  </div>
 </section>
 
 <!-- ============ Ch3 状态流转 ============ -->
@@ -698,14 +704,36 @@ calendar 页面
   <h4>A. feedback 云函数（反馈功能必需）</h4>
   <ol class="steps">
     <li>打开 <span class="path">cloudfunctions/feedback/index.js</span></li>
-    <li>找到第 15 行，把 <code>ADMIN_KEY</code> 改成你自己的随机字符串：
+    <li>找到顶部，把 <code>ADMIN_KEY</code> 改成你自己的随机字符串：
       <pre><code>const ADMIN_KEY = 'your-random-secret-string-here';</code></pre>
     </li>
-    <li>（可选）第 9 行 <code>ADMIN_OPENIDS</code> 数组里加上你的 openid，这样小程序端彩蛋也能识别管理员</li>
+    <li>（可选）<code>ADMIN_OPENIDS</code> 数组里加上你的 openid，这样小程序端彩蛋也能识别管理员</li>
     <li>微信开发者工具中，左侧 <span class="path">cloudfunctions/feedback</span> 文件夹上<b>右键</b></li>
     <li>选择 <b>「上传并部署：云端安装依赖」</b></li>
     <li>等待控制台显示部署成功 ✅</li>
   </ol>
+
+  <div class="callout warn">
+    <strong>⚠️ v1.1 必须重新部署 feedback 云函数</strong>
+    v1.1 新增了 <code>reply</code>（管理员回复）、<code>stats</code>（统计）两个 action，
+    以及 <code>listAll</code> 的 type 筛选和 keyword 搜索。<mark class="warn">旧版云函数没有这些功能</mark>，
+    务必右键重新上传部署。
+  </div>
+
+  <h4>feedback 云函数完整 Action 列表（v1.1）</h4>
+  <table>
+    <thead><tr><th>Action</th><th>调用方</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><code>submit</code></td><td>用户端</td><td>提交新反馈，自动设置 <code>status='pending'</code></td></tr>
+      <tr><td><code>list</code></td><td>用户端</td><td>拉取当前用户自己的反馈历史（含管理员回复）</td></tr>
+      <tr><td><code>listAll</code></td><td>管理端</td><td>拉取全部反馈，支持 <code>status</code> / <code>type</code> / <code>keyword</code> 筛选</td></tr>
+      <tr><td><code>markResolved</code></td><td>管理端</td><td>切换状态：<code>pending</code> ↔ <code>resolved</code>。标记已处理时自动补默认回复（如果还没有）</td></tr>
+      <tr><td><code>reply</code></td><td>管理端</td><td><b>管理员回复（v1.1 新增）</b>，写入 <code>adminReply</code> + <code>repliedAt</code>，<mark class="key">自动标记已处理</mark></td></tr>
+      <tr><td><code>delete</code></td><td>管理端</td><td>永久删除一条反馈</td></tr>
+      <tr><td><code>stats</code></td><td>管理端</td><td><b>统计面板（v1.1 新增）</b>，返回总数 + 待处理 + 已处理 + 按类型分布</td></tr>
+      <tr><td><code>checkAdmin</code></td><td>两端</td><td>检查当前调用者是否管理员</td></tr>
+    </tbody>
+  </table>
 
   <h4>B. 其他云函数</h4>
   <p><span class="path">login</span>、<span class="path">action</span>、<span class="path">record</span> 等云函数同理右键上传部署即可。</p>
@@ -743,8 +771,15 @@ calendar 页面
       <tr><td><code>status</code></td><td>string</td><td><code>pending</code> / <code>resolved</code></td></tr>
       <tr><td><code>createdAt</code></td><td>number</td><td>Unix 时间戳（毫秒）</td></tr>
       <tr><td><code>resolvedAt</code></td><td>number | null</td><td>标记已处理时的时间戳</td></tr>
+      <tr><td><code>adminReply</code></td><td>string</td><td><b>管理员回复内容</b>（≤500 字，<mark class="key">v1.1 新增</mark>）</td></tr>
+      <tr><td><code>repliedAt</code></td><td>number | null</td><td><b>回复时间戳</b>（<mark class="key">v1.1 新增</mark>）</td></tr>
     </tbody>
   </table>
+
+  <div class="callout tip">
+    <strong>💡 老数据兼容</strong>
+    <code>adminReply</code> / <code>repliedAt</code> 是 v1.1 新增字段，历史 feedback 记录不会有这两个字段。云函数和前端会把缺失当作空值处理，<mark class="ok">不需要数据迁移</mark>。
+  </div>
 
   <h3 id="ch4-4">4.4 云开发控制台安全设置</h3>
 
@@ -821,17 +856,64 @@ calendar 页面
     <li>连接成功后，浏览器会记忆这两个值，下次自动填好</li>
   </ol>
 
-  <h4>C. 管理反馈</h4>
+  <h4>C. 管理反馈（小程序端 &amp; Web 端一致）</h4>
+
+  <h4>C1. 📊 统计面板</h4>
+  <p>管理后台顶部有<mark class="key">实时统计面板</mark>，一目了然当前反馈情况：</p>
+  <table>
+    <thead><tr><th>指标</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><b>全部</b></td><td>总反馈数量</td></tr>
+      <tr><td><b>待处理</b></td><td>status = <code>pending</code> 的数量（<span style="color:var(--accent2)">橙色</span>）</td></tr>
+      <tr><td><b>已处理</b></td><td>status = <code>resolved</code> 的数量（<span style="color:var(--ok)">绿色</span>）</td></tr>
+      <tr><td><b>按类型分布</b></td><td>Bug / 建议 / 体验 / 其他 各自的数量</td></tr>
+    </tbody>
+  </table>
+
+  <h4>C2. 🔍 搜索 &amp; 筛选</h4>
+  <table>
+    <thead><tr><th>筛选器</th><th>说明</th></tr></thead>
+    <tbody>
+      <tr><td><b>关键词搜索</b></td><td>输入框实时过滤反馈内容（300ms 防抖），正则匹配不区分大小写</td></tr>
+      <tr><td><b>类型筛选</b></td><td>chips：全部类型 / Bug / 建议 / 体验 / 其他，点一下激活，再点一下取消</td></tr>
+      <tr><td><b>状态 Tabs</b></td><td>全部 / 待处理 / 已处理，每个 tab 带实时计数，组合筛选生效</td></tr>
+    </tbody>
+  </table>
+
+  <h4>C3. 💬 管理员回复</h4>
+  <ol class="steps">
+    <li>在列表里找到要回复的反馈，点击<b>展开 ▼</b>（小程序端）或直接展开（Web 端）</li>
+    <li>如果还没有管理员回复 → 下方显示<b>回复输入框</b>（最多 500 字）</li>
+    <li>输入回复内容 → 点 <b>发送回复</b></li>
+    <li>回复后自动：<mark class="key">写入 adminReply + repliedAt</mark> + <mark class="key">状态变为 resolved</mark></li>
+    <li>用户在自己的反馈历史里就能看到回复了</li>
+  </ol>
+
+  <div class="callout info">
+    <strong>🔄 回复 ↔ 状态 的联动关系</strong>
+    <ul style="margin:6px 0 0 20px;font-size:14px">
+      <li>发送回复 → 自动标记 <code>resolved</code>（不需要单独点「标记已处理」）</li>
+      <li>「标记已处理」但不回复 → 系统自动补一条默认回复 <code>"感谢你的反馈，已处理！"</code></li>
+      <li>「标记待处理」→ 只改状态，<b>不会清除已有的回复内容</b>（重新回复会覆盖旧回复）</li>
+    </ul>
+  </div>
+
+  <h4>C4. 完整操作速查</h4>
 
   <table>
-    <thead><tr><th>操作</th><th>怎么做</th></tr></thead>
+    <thead><tr><th>操作</th><th>小程序端</th><th>Web 端</th></tr></thead>
     <tbody>
-      <tr><td>切换筛选</td><td>顶部 Tabs：<b>全部</b> / <b>待处理</b> / <b>已处理</b>（每个 tab 后面有计数）</td></tr>
-      <tr><td>标记已处理</td><td>待处理条目 → 点 <b>标记已处理</b> 按钮</td></tr>
-      <tr><td>撤销处理</td><td>已处理条目 → 点 <b>标记待处理</b> 按钮</td></tr>
-      <tr><td>删除反馈</td><td>点 <b>删除</b> → 二次确认 → 永久删除</td></tr>
-      <tr><td>复制内容</td><td>直接<b>点击反馈内容区域</b> → 自动复制到剪贴板</td></tr>
-      <tr><td>刷新</td><td>点右上角 🔄 刷新按钮</td></tr>
+      <tr><td>查看列表</td><td>自动加载，下拉刷新</td><td>自动加载，点 🔄 刷新按钮</td></tr>
+      <tr><td>筛选状态</td><td>点顶部 Tabs</td><td>点顶部 Tabs</td></tr>
+      <tr><td>筛选类型</td><td>横向滚动 Chips（全部类型 / Bug / 建议 / 体验 / 其他）</td><td>横向 Chips</td></tr>
+      <tr><td>关键词搜索</td><td>—</td><td>搜索框 300ms 自动 + Enter 手动</td></tr>
+      <tr><td>展开详情</td><td>点条目右侧 <b>展开 ▼</b></td><td>点条目头部 <b>展开 ▼</b></td></tr>
+      <tr><td>标记已处理</td><td>展开后点 <b>标记已处理</b> 按钮</td><td>展开后点 <b>标记已处理</b></td></tr>
+      <tr><td>标记待处理</td><td>已处理条目展开后 → 按钮变为 <b>标记待处理</b></td><td>同左</td></tr>
+      <tr><td>发送回复</td><td>展开后在回复输入框输入 → <b>发送回复</b></td><td>同左</td></tr>
+      <tr><td>删除</td><td>点 <b>删除</b> → 二次确认弹窗</td><td>点 <b>删除</b> → confirm() 确认</td></tr>
+      <tr><td>复制反馈内容</td><td>点反馈内容区域（蓝色高亮块）</td><td>同左</td></tr>
+      <tr><td>复制联系方式</td><td>展开后点 <b>复制</b> 链接</td><td>同左</td></tr>
     </tbody>
   </table>
 
@@ -943,7 +1025,8 @@ K.pending = 'tp_pending_dates'        // 待同步队列</code></pre>
 </div>
 
 <footer>
-  健身容量记录 v1.0 · 操作手册 · 2026年11月<br>
+  健身容量记录 v1.1 · 操作手册 · 2026年11月<br>
+  v1.1 新增：管理员回复、统计面板、搜索筛选、feedback 云函数完整 action 列表<br>
   本手册内容与代码同步更新，如有不一致请以代码为准
 </footer>
 
