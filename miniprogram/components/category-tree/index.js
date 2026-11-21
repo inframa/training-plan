@@ -64,27 +64,27 @@ Component({
       this.setData({ rows });
     },
 
-    // ---------- 选择 ----------
+    // ---------- 点击：整行折叠/展开 or 选择 ----------
     onTap(e) {
-      const { path, label } = e.currentTarget.dataset;
-      if (this.data.managing || this.data.dragging) return;
-      if (path === '__all__' && label === undefined) return;
-      if (!this.data.multi && this._exp && path !== '__all__') {
-        if (this._exp[path] === undefined) this._exp[path] = true;
-      }
-      this.triggerEvent('select', { path, label });
-    },
-
-    onArrow(e) {
       const { path } = e.currentTarget.dataset;
+      if (this.data.managing || this.data.dragging) return;
+      const row = (this.data.rows || []).find((r) => r.path === path);
       if (path === '__all__') {
-        // 「全部」行箭头：循环切换所有子分类的折叠/展开
+        // 「全部」行：整行点击 = 循环切换全部折叠/展开
         if (this._hasAnyExpanded(this.data.tree)) this.onCollapseAll();
         else this.onExpandAll();
-      } else {
+        return;
+      }
+      if (row && row.hasChildren) {
+        // 有子节点：整行点击 = 单独切换展开/折叠
         this._exp[path] = !(this._exp[path] !== false);
         this.rebuild();
+        return;
       }
+      // 无子节点：触发筛选
+      const { label } = e.currentTarget.dataset;
+      if (this._exp) this._exp[path] = true;
+      this.triggerEvent('select', { path, label });
     },
 
     // ---------- 全部折叠 / 全部展开 ----------

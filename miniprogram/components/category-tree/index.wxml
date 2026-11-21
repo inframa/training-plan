@@ -17,27 +17,19 @@
     bindtap="onTap"
     hover-class="ctree-row-hover"
   >
-    <!-- 「全部」行：管理模式下右侧显示「添加根节点」 -->
+    <!-- 「全部」行 -->
     <block wx:if="{{item.path === '__all__'}}">
-      <text
-        wx:if="{{item.hasChildren}}"
-        class="ctree-arrow ctree-arrow-all"
-        catchtap="onArrow"
-        data-path="{{item.path}}"
-      >{{item.expanded ? '▾' : '▸'}}</text>
+      <text wx:if="{{item.hasChildren}}" class="ctree-arrow ctree-arrow-all">{{item.expanded ? '▾' : '▸'}}</text>
       <text wx:else class="ctree-arrow ctree-arrow-placeholder"></text>
       <text class="ctree-label">{{item.label}}</text>
-      <view wx:if="{{managing}}" class="ctree-add-root" catchtap="onAddTop">＋</view>
+      <view wx:if="{{managing}}" class="ctree-ops" catchtap="noop">
+        <text class="ctree-op add" catchtap="onAddTop">＋</text>
+      </view>
     </block>
 
     <!-- 普通分类行 -->
     <block wx:else>
-      <text
-        wx:if="{{item.hasChildren}}"
-        class="ctree-arrow"
-        catchtap="onArrow"
-        data-path="{{item.path}}"
-      >{{item.expanded ? '▾' : '▸'}}</text>
+      <text wx:if="{{item.hasChildren}}" class="ctree-arrow">{{item.expanded ? '▾' : '▸'}}</text>
       <text wx:else class="ctree-arrow ctree-arrow-placeholder"></text>
       <text class="ctree-label">{{item.label}}</text>
       <view wx:if="{{managing}}" class="ctree-ops" catchtap="noop">

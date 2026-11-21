@@ -33,33 +33,30 @@
   font-weight: 600;
 }
 
-/* 「全部」行视觉区分 */
+/* 「全部」行：整行深蓝背景 */
 .ctree-row.is-all {
-  border-bottom: 1rpx solid #EEF0F4;
-  margin-bottom: 4rpx;
+  background: #1D4ED8;
+  color: #fff;
   font-weight: 600;
-  color: #222;
+  border-left-color: #1D4ED8;
+}
+
+.ctree-row.is-all .ctree-label {
+  color: #fff;
 }
 
 .ctree-row.is-all .ctree-arrow-all {
-  color: #2E6BE6;
-}
-
-/* 「添加根节点」按钮（管理模式下显示在「全部」行右侧） */
-.ctree-add-root {
-  flex-shrink: 0;
-  width: 48rpx;
-  height: 48rpx;
-  line-height: 44rpx;
-  text-align: center;
-  border-radius: 50%;
-  font-size: 30rpx;
   color: #fff;
-  background: #1D4ED8;
 }
 
-.ctree-add-root:active {
+.ctree-row.is-all:active {
   background: #1E40AF;
+}
+
+/* 「全部」行里的 + 按钮跟子节点保持一致 */
+.ctree-row.is-all .ctree-op.add {
+  color: #2E6BE6;
+  background: rgba(255, 255, 255, 0.95);
 }
 
 .ctree-row.is-dragging {
