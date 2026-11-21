@@ -22,6 +22,18 @@
       </view>
     </view>
     <view class="tr-hint" wx:if="{{uncountedHint}}">部分动作未计入总容量</view>
+    <view class="tr-status-bar" wx:if="{{recordStatus}}">
+      <view class="tr-status-left">
+        <view class="tr-status-badge {{recordStatus === 'trained' ? 'trained' : 'untrained'}}">
+          {{recordStatus === 'trained' ? '已训练' : '未训练'}}
+        </view>
+        <text class="muted" wx:if="{{totalSetCount}}">已完成 {{doneSetCount}}/{{totalSetCount}} 组</text>
+      </view>
+      <view class="tr-status-right">
+        <view wx:if="{{doneSetCount === 0}}" class="tr-status-btn primary" bindtap="markAllDone">标记完成</view>
+        <view wx:else class="tr-status-btn plain" bindtap="markAllUndone">撤销完成</view>
+      </view>
+    </view>
   </view>
 
   <!-- 训练标题与备注 -->

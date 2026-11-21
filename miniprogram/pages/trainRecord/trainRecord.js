@@ -200,14 +200,51 @@ Page({
       setsCount: (a.sets || []).length,
       thumb: (a.snapshot.imageFileIds && a.snapshot.imageFileIds[0]) || ''
     }));
+    const doneSetCount = cap.countDoneSets(r.dayActions.reduce((arr, a) => arr.concat(a.sets || []), []));
+    const hasActions = r.dayActions.length > 0;
+    const recordStatus = !hasActions ? '' : doneSetCount > 0 ? 'trained' : 'untrained';
     this.setData({
       dayActions,
       totalVolume: cap.fmtVol(cap.dayVolume(r.dayActions)),
       doneActionCount: cap.countDoneActions(r.dayActions),
-      doneSetCount: cap.countDoneSets(r.dayActions.reduce((arr, a) => arr.concat(a.sets || []), [])),
+      doneSetCount,
       totalSetCount: cap.countTotalSets(r.dayActions),
-      uncountedHint: cap.hasUncounted(r.dayActions)
+      uncountedHint: cap.hasUncounted(r.dayActions),
+      recordStatus
     });
+  },
+
+  // ---------- 状态流转 ----------
+  markAllDone() {
+    if (!this.record || !this.record.dayActions.length) return;
+    let count = 0;
+    this.record.dayActions.forEach((a) => {
+      (a.sets || []).forEach((s) => {
+        if (!s.done) { s.done = true; count++; }
+      });
+    });
+    if (!count) {
+      wx.showToast({ title: '已经是全部完成', icon: 'none' });
+      return;
+    }
+    this.touch();
+    wx.showToast({ title: '已标记 ' + count + ' 组为完成', icon: 'none' });
+  },
+
+  markAllUndone() {
+    if (!this.record || !this.record.dayActions.length) return;
+    let count = 0;
+    this.record.dayActions.forEach((a) => {
+      (a.sets || []).forEach((s) => {
+        if (s.done) { s.done = false; count++; }
+      });
+    });
+    if (!count) {
+      wx.showToast({ title: '还没有完成的组', icon: 'none' });
+      return;
+    }
+    this.touch();
+    wx.showToast({ title: '已撤销 ' + count + ' 组完成状态', icon: 'none' });
   },
 
   // ---------- 标题 / 备注 ----------
@@ -392,11 +429,15 @@ Page({
     set[field] = value;
     // 输入过程中只重算汇总，不整体刷新列表（避免输入框光标跳动）
     const r = this.record;
+    const dsc = cap.countDoneSets(r.dayActions.reduce((arr, a) => arr.concat(a.sets || []), []));
+    const hasActions = r.dayActions.length > 0;
+    const recordStatus = !hasActions ? '' : dsc > 0 ? 'trained' : 'untrained';
     this.setData({
       totalVolume: cap.fmtVol(cap.dayVolume(r.dayActions)),
       doneActionCount: cap.countDoneActions(r.dayActions),
-      doneSetCount: cap.countDoneSets(r.dayActions.reduce((arr, a) => arr.concat(a.sets || []), [])),
-      uncountedHint: cap.hasUncounted(r.dayActions)
+      doneSetCount: dsc,
+      uncountedHint: cap.hasUncounted(r.dayActions),
+      recordStatus
     });
     store.saveLocalRecord(r);
     this.schedulePush();
