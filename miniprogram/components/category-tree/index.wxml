@@ -5,9 +5,9 @@
   bindtouchmove="onTouchMove"
   bindtouchend="onTouchEnd"
 >
-  <!-- 管理模式顶部工具栏：添加顶级 + 折叠/展开 -->
-  <view wx:if="{{editable && managing}}" class="ctree-toolbar">
-    <view class="ctree-tool-btn ctree-add-top" bindtap="onAddTop">
+  <!-- 顶部工具栏：添加顶级（管理模式）+ 折叠/展开（始终显示） -->
+  <view wx:if="{{editable}}" class="ctree-toolbar">
+    <view wx:if="{{managing}}" class="ctree-tool-btn ctree-add-top" bindtap="onAddTop">
       <text class="ctree-add-icon">＋</text>
       <text class="ctree-add-label">添加顶级</text>
     </view>
