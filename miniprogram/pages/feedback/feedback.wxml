@@ -1,0 +1,47 @@
+<view class="page fb">
+  <view class="card">
+    <view class="h2" style="margin-bottom: 16rpx">提交反馈</view>
+    <view class="fb-types">
+      <view
+        wx:for="{{types}}"
+        wx:key="id"
+        class="fb-type {{selectedType === item.id ? 'on' : ''}}"
+        data-id="{{item.id}}"
+        bindtap="onTypeTap"
+      >{{item.label}}</view>
+    </view>
+    <textarea
+      class="fb-textarea"
+      placeholder="描述你遇到的问题或建议，越详细越好…"
+      maxlength="1000"
+      value="{{content}}"
+      bindinput="onContent"
+    />
+    <view class="field-label" style="margin-top: 20rpx">联系方式（可选）</view>
+    <input class="input" placeholder="邮箱 / 微信，方便我们回复" value="{{contact}}" bindinput="onContact" />
+    <view class="btn" style="margin-top: 24rpx" bindtap="onSubmit">{{submitting ? '提交中…' : '提交反馈'}}</view>
+  </view>
+
+  <view class="card">
+    <view class="row between" bindtap="toggleHistory">
+      <view class="h2">我的反馈历史</view>
+      <text class="link">{{showHistory ? '收起' : '展开'}}</text>
+    </view>
+    <block wx:if="{{showHistory}}">
+      <view wx:if="{{myList.length === 0}}" class="empty" style="padding: 60rpx 0">
+        <view class="muted">还没有提交过反馈</view>
+      </view>
+      <view wx:for="{{myList}}" wx:key="_id" class="fb-item">
+        <view class="row between">
+          <text class="fb-type-tag {{item.type}}">{{item.typeLabel}}</text>
+          <text class="fb-status {{item.status}}">{{item.resolvedLabel}}</text>
+        </view>
+        <view class="fb-content">{{item.content}}</view>
+        <view class="row between fb-meta">
+          <text class="muted">{{item.timeLabel}}</text>
+          <text class="muted" wx:if="{{item.contact}}">联系方式：{{item.contact}}</text>
+        </view>
+      </view>
+    </block>
+  </view>
+</view>

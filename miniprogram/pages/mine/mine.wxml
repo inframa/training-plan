@@ -40,6 +40,10 @@
   <!-- 设置 -->
   <view class="card">
     <view class="h2" style="margin-bottom: 24rpx">设置</view>
+    <view class="mine-row row between" bindtap="onFeedback">
+      <text>意见反馈</text>
+      <text class="muted">›</text>
+    </view>
     <view class="mine-row row between" bindtap="onManagePartTree">
       <text>身体部位分类管理</text>
       <text class="muted">›</text>
