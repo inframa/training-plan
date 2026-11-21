@@ -30,9 +30,21 @@ Component({
     onKey(e) {
       const k = e.currentTarget.dataset.key;
       let { expr } = this.data;
-      if (k === 'C') expr = '';
-      else if (k === 'back') expr = expr.slice(0, -1);
-      else expr += k;
+      if (k === 'C') {
+        expr = '';
+      } else if (k === 'back') {
+        expr = expr.slice(0, -1);
+      } else if (k === '=') {
+        // 等号：直接计算当前表达式，不把 = 拼进去
+        const r = evalExpr(expr);
+        if (r === null) {
+          wx.showToast({ title: '表达式有误', icon: 'none' });
+          return;
+        }
+        expr = String(r);
+      } else {
+        expr += k;
+      }
       this.update(expr);
     },
 

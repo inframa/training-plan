@@ -1,7 +1,9 @@
 // 图片压缩与临时地址
-// 约束：长边 ≤ 1920px，体积 ≤ 2MB
-const LONG_EDGE = 1920;
-const MAX_SIZE = 2 * 1024 * 1024;
+// 约束：体积 ≤ 1MB；长边从 1920px 起逐级缩小直至达标
+const QUALITY = 70;
+const MAX_SIZE = 1 * 1024 * 1024;
+// 长边逐级下调：1920 → 1280 → 960 → 720 → 540 → 360
+const LONG_EDGE_STEPS = [1920, 1280, 960, 720, 540, 360];
 
 function getImageInfo(src) {
   return new Promise((resolve, reject) => {
@@ -34,34 +36,47 @@ function fileSize(path) {
   });
 }
 
-// 压缩单张图片；失败时回退原图
+// 压缩单张图片：固定质量 70，长边逐级缩小直至体积 ≤ 1MB
 async function compressOne(src) {
   try {
     const info = await getImageInfo(src);
     let cw, ch;
-    if (info.width > LONG_EDGE || info.height > LONG_EDGE) {
+    // 从原始尺寸或最大 step 开始，取更小的那个
+    const startEdge = Math.min(info.width, info.height, LONG_EDGE_STEPS[0]);
+    if (startEdge === info.width && startEdge === info.height) {
+      cw = ch = startEdge;
+    } else if (info.width >= info.height) {
+      ch = startEdge;
+      cw = Math.round((info.width * startEdge) / info.height);
+    } else {
+      cw = startEdge;
+      ch = Math.round((info.height * startEdge) / info.width);
+    }
+
+    let out = src;
+    let size = Infinity;
+
+    for (const edge of LONG_EDGE_STEPS) {
+      // 计算当前 step 下的目标像素
       if (info.width >= info.height) {
-        cw = LONG_EDGE;
-        ch = Math.round((info.height * LONG_EDGE) / info.width);
+        ch = edge;
+        cw = Math.round((info.width * edge) / info.height);
       } else {
-        ch = LONG_EDGE;
-        cw = Math.round((info.width * LONG_EDGE) / info.height);
+        cw = edge;
+        ch = Math.round((info.height * edge) / info.width);
       }
-    }
-    let out = await compress(src, 80, cw, ch).catch(() => src);
-    let size = await fileSize(out);
-    if (size > MAX_SIZE) {
-      out = await compress(src, 50, cw, ch).catch(() => out);
+      out = await compress(src, QUALITY, cw, ch).catch(() => src);
       size = await fileSize(out);
-      if (size > MAX_SIZE) out = src; // 仍超限则保留原图，由上传端兜底
+      if (size <= MAX_SIZE) break;
     }
+    // 循环结束仍超限（极端情况，如纯黑大图），返回最后一次压缩结果
     return out;
   } catch (e) {
     return src;
   }
 }
 
-// 选择并压缩 count 张图片，返回临时路径数组
+// 选择并压缩 count 张图片，返回临时路径数组（自动逐级降分辨率，确保 ≤ 1MB）
 function chooseAndCompress(count) {
   return new Promise((resolve, reject) => {
     wx.chooseMedia({
@@ -95,4 +110,4 @@ function tempFileURLs(fileIds) {
   });
 }
 
-module.exports = { compressOne, chooseAndCompress, tempFileURLs, LONG_EDGE, MAX_SIZE };
+module.exports = { compressOne, chooseAndCompress, tempFileURLs, LONG_EDGE_STEPS, MAX_SIZE };

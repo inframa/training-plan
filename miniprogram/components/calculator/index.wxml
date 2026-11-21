@@ -24,7 +24,7 @@
     <view class="calc-key" data-key="1" bindtap="onKey">1</view>
     <view class="calc-key" data-key="2" bindtap="onKey">2</view>
     <view class="calc-key" data-key="3" bindtap="onKey">3</view>
-    <view class="calc-key eq" data-key="=" bindtap="onEq">=</view>
+    <view class="calc-key eq" data-key="=" bindtap="onKey">=</view>
     <view class="calc-key wide" data-key="0" bindtap="onKey">0</view>
     <view class="calc-key" data-key="." bindtap="onKey">.</view>
     <view class="calc-key ok" bindtap="onConfirm">确认</view>

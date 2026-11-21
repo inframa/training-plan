@@ -19,6 +19,7 @@
   border-left: 6rpx solid transparent;
   font-size: 28rpx;
   color: #333;
+  position: relative;
 }
 
 .ctree-row.is-selected {
@@ -26,6 +27,25 @@
   background: #EDF3FE;
   color: #2E6BE6;
   font-weight: 600;
+}
+
+.ctree-row.is-dragging {
+  opacity: 0.35;
+}
+
+.ctree-row.is-target {
+  border-bottom: 4rpx solid #2E6BE6;
+}
+
+.ctree-row.is-target::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -2rpx;
+  height: 4rpx;
+  background: #2E6BE6;
+  pointer-events: none;
 }
 
 .ctree-label {
@@ -43,6 +63,10 @@
   font-size: 24rpx;
 }
 
+.ctree-arrow-placeholder {
+  visibility: hidden;
+}
+
 .ctree-ops {
   display: flex;
   align-items: center;
@@ -58,6 +82,13 @@
   font-size: 30rpx;
 }
 
+.ctree-op.drag-handle {
+  color: #9AA3AE;
+  background: transparent;
+  font-size: 34rpx;
+  letter-spacing: 2rpx;
+}
+
 .ctree-op.add {
   color: #2E6BE6;
   background: #EDF3FE;
@@ -66,6 +97,50 @@
 .ctree-op.del {
   color: #E5484D;
   background: #FDECEC;
+}
+
+/* 树内"添加顶级分类"按钮（已并入 toolbar，样式覆盖见下） */
+
+/* 管理模式顶部工具栏 */
+.ctree-toolbar {
+  display: flex;
+  align-items: center;
+  padding: 12rpx 16rpx;
+  border-bottom: 1rpx solid #EEF0F4;
+  background: #FAFBFC;
+  gap: 12rpx;
+}
+
+.ctree-tool-btn {
+  flex-shrink: 0;
+  height: 52rpx;
+  line-height: 52rpx;
+  padding: 0 20rpx;
+  border-radius: 26rpx;
+  font-size: 24rpx;
+  color: #2E6BE6;
+  background: #EDF3FE;
+}
+
+.ctree-tool-btn:active {
+  opacity: 0.7;
+}
+
+.ctree-add-top {
+  display: flex;
+  align-items: center;
+  padding-left: 16rpx;
+  padding-right: 20rpx;
+  font-weight: 600;
+}
+
+.ctree-add-icon {
+  margin-right: 6rpx;
+  font-size: 28rpx;
+}
+
+.ctree-add-label {
+  font-size: 24rpx;
 }
 
 .ctree-foot {

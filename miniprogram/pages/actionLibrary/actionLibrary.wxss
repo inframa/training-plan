@@ -6,7 +6,7 @@
   padding: 0;
 }
 .lib-side {
-  width: 176rpx;
+  width: 240rpx;
   flex-shrink: 0;
   height: 100%;
   background: #fff;

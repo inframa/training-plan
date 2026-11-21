@@ -1,7 +1,7 @@
 <view class="page lib lib-h">
   <!-- 左侧竖排分类树 -->
   <view class="lib-side">
-    <category-tree
+    <category-tree style="width: 100%; display: flex; box-sizing: border-box"
       tree="{{partTree}}"
       selected="{{part}}"
       all-label="全部"
@@ -13,7 +13,7 @@
   </view>
 
   <!-- 右侧列表区 -->
-  <view class="lib-main">
+  <view class="lib-main" style="width: 328rpx; display: block; box-sizing: border-box; left: 0rpx; top: 0rpx">
     <view class="lib-filter-bar">
       <input class="input flex1" placeholder="搜索动作名称" value="{{keyword}}" bindinput="onKeyword" confirm-type="search" />
       <text class="lib-clear" wx:if="{{keyword}}" bindtap="onClearKeyword">清除</text>
