@@ -35,11 +35,15 @@
       },
       {
         "pagePath": "pages/planTemplate/planTemplate",
-        "text": "训练计划"
+        "text": "训练计划",
+        "iconPath": "images/tab/plan.png",
+        "selectedIconPath": "images/tab/plan-active.png"
       },
       {
         "pagePath": "pages/mine/mine",
-        "text": "我的"
+        "text": "我的",
+        "iconPath": "images/tab/mine.png",
+        "selectedIconPath": "images/tab/mine-active.png"
       }
     ]
   },
