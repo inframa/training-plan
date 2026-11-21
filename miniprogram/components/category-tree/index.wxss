@@ -126,6 +126,28 @@
   opacity: 0.7;
 }
 
+/* 图标按钮：方形，只显示一个 unicode 图标 */
+.ctree-icon-btn {
+  width: 52rpx;
+  height: 52rpx;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-radius: 50%;
+}
+
+.ctree-icon-btn-hover {
+  background: #EDF3FE;
+}
+
+.ctree-icon {
+  font-size: 36rpx;
+  color: #2E6BE6;
+  line-height: 1;
+}
+
 .ctree-add-top {
   display: flex;
   align-items: center;

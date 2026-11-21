@@ -11,8 +11,12 @@
       <text class="ctree-add-icon">＋</text>
       <text class="ctree-add-label">添加顶级</text>
     </view>
-    <view class="ctree-tool-btn" bindtap="onCollapseAll">全部折叠</view>
-    <view class="ctree-tool-btn" bindtap="onExpandAll">全部展开</view>
+    <view class="ctree-tool-btn ctree-icon-btn" bindtap="onCollapseAll" hover-class="ctree-icon-btn-hover">
+      <text class="ctree-icon">⛶</text>
+    </view>
+    <view class="ctree-tool-btn ctree-icon-btn" bindtap="onExpandAll" hover-class="ctree-icon-btn-hover">
+      <text class="ctree-icon">⤢</text>
+    </view>
   </view>
 
   <view
