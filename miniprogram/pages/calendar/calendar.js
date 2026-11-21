@@ -11,7 +11,7 @@ Page({
     today: '',
     selected: '',
     marks: {},
-    monthMeta: { trained: 0, draft: 0 }
+    monthMeta: { trained: 0, untrained: 0 }
   },
   unsub: null,
 
@@ -43,9 +43,9 @@ Page({
     const ym = this.data.year + '-' + dateUtil.pad(this.data.month);
     const marks = store.getMonthMarks(ym);
     let trained = 0;
-    let draft = 0;
-    Object.keys(marks).forEach((d) => (marks[d].status === 'trained' ? trained++ : draft++));
-    this.setData({ marks, monthMeta: { trained, draft } });
+    let untrained = 0;
+    Object.keys(marks).forEach((d) => (marks[d].status === 'trained' ? trained++ : untrained++));
+    this.setData({ marks, monthMeta: { trained, untrained } });
   },
 
   // 拉取云端当月数据合并

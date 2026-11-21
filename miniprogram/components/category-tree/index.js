@@ -169,7 +169,7 @@ Component({
     onAddTop() {
       const self = this;
       wx.showModal({
-        title: '添加顶级分类',
+        title: '添加根节点',
         editable: true,
         placeholderText: '分类名称',
         success(res) {

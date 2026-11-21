@@ -189,13 +189,13 @@ function deleteLocalRecord(date) {
   notify();
 }
 
-// 日历标记：有动作且无已完成组 → 草稿；有已完成组 → 已训练
+// 日历标记：有动作且无已完成组 → 未训练；有已完成组 → 已训练
 // 标记内容为训练标题 + 当日容量（旧数据无标题时回退用标签拼接）
 function markOf(record) {
   if (!record || !record.dayActions || !record.dayActions.length) return null;
   const done = record.dayActions.some((a) => (a.sets || []).some((s) => s.done));
   const title = record.title || (record.tags || []).join('·');
-  return { title: title || '', volume: capacity.dayVolume(record.dayActions), status: done ? 'trained' : 'draft' };
+  return { title: title || '', volume: capacity.dayVolume(record.dayActions), status: done ? 'trained' : 'untrained' };
 }
 
 // ---------- 月历标记 ----------
@@ -216,7 +216,7 @@ function mergeCloudMonth(ym, days) {
   const marks = {};
   (days || []).forEach((d) => {
     const title = d.title || (d.tags || []).join('·');
-    marks[d.date] = { title: title || '', volume: d.volume || 0, status: d.status || 'draft' };
+    marks[d.date] = { title: title || '', volume: d.volume || 0, status: d.status || 'untrained' };
   });
   (state.pendingDates || []).forEach((date) => {
     if (date.indexOf(ym) === 0) {

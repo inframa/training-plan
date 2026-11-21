@@ -7,7 +7,7 @@
     </view>
     <view class="row cal-meta">
       <text class="muted">已训练 {{monthMeta.trained}} 天</text>
-      <text class="muted" wx:if="{{monthMeta.draft}}"> · 草稿 {{monthMeta.draft}} 天</text>
+      <text class="muted" wx:if="{{monthMeta.untrained}}"> · 未训练 {{monthMeta.untrained}} 天</text>
       <view class="flex1"></view>
       <text class="link" bindtap="onGoToday">回到今天</text>
     </view>
@@ -22,7 +22,7 @@
     />
     <view class="cal-legend">
       <view class="lg"><view class="dot blue"></view>已训练</view>
-      <view class="lg"><view class="dot orange"></view>草稿</view>
+      <view class="lg"><view class="dot orange"></view>未训练</view>
       <view class="lg muted">点击日期查看 / 补录训练</view>
     </view>
   </view>
