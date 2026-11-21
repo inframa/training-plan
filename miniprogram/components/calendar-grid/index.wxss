@@ -14,12 +14,12 @@
 }
 .cg-cell {
   flex: 1;
-  height: 140rpx;
+  height: 220rpx;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-start;
-  padding-top: 10rpx;
+  padding: 12rpx 6rpx 8rpx;
   border-radius: 12rpx;
   box-sizing: border-box;
   overflow: hidden;
@@ -43,26 +43,50 @@
 .cg-cell.future .cg-day {
   color: #c3c8cf;
 }
+.cg-title-row {
+  display: flex;
+  align-items: center;
+  margin-top: 8rpx;
+  width: 100%;
+  justify-content: center;
+  gap: 6rpx;
+}
 .cg-dot {
   width: 10rpx;
   height: 10rpx;
   border-radius: 50%;
-  margin-top: 6rpx;
+  flex-shrink: 0;
   background: #e6912e;
 }
 .cg-dot.trained {
   background: #2e6be6;
 }
-.cg-info {
+.cg-title {
+  font-size: 22rpx;
+  line-height: 28rpx;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-weight: 500;
+}
+.cg-title.trained {
+  color: #2e6be6;
+}
+.cg-title.untrained {
+  color: #e6912e;
+}
+.cg-volume {
   font-size: 18rpx;
-  color: #4a5058;
+  color: #8a9099;
+  line-height: 24rpx;
   margin-top: 4rpx;
-  line-height: 26rpx;
-  max-width: 94%;
+  max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
-.cg-cell.future .cg-info {
+.cg-cell.future .cg-title,
+.cg-cell.future .cg-volume {
   color: #c3c8cf;
 }

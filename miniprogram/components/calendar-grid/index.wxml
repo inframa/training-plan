@@ -14,8 +14,11 @@
     >
       <view class="cg-day {{cell.isToday ? 'today' : ''}}">{{cell.day}}</view>
       <block wx:if="{{cell.hasMark}}">
-        <view class="cg-dot {{cell.trained ? 'trained' : ''}}"></view>
-        <view class="cg-info" wx:if="{{cell.info}}">{{cell.info}}</view>
+        <view class="cg-title-row" wx:if="{{cell.title}}">
+          <view class="cg-dot {{cell.trained ? 'trained' : ''}}"></view>
+          <view class="cg-title {{cell.trained ? 'trained' : 'untrained'}}">{{cell.title}}</view>
+        </view>
+        <view class="cg-volume" wx:if="{{cell.volumeText}}">{{cell.volumeText}}</view>
       </block>
     </view>
   </view>
