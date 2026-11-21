@@ -43,19 +43,11 @@
 .cg-cell.future .cg-day {
   color: #c3c8cf;
 }
-.cg-title-row {
-  display: flex;
-  align-items: center;
-  margin-top: 8rpx;
-  width: 100%;
-  justify-content: center;
-  gap: 6rpx;
-}
 .cg-dot {
   width: 10rpx;
   height: 10rpx;
   border-radius: 50%;
-  flex-shrink: 0;
+  margin-top: 8rpx;
   background: #e6912e;
 }
 .cg-dot.trained {
@@ -64,11 +56,13 @@
 .cg-title {
   font-size: 22rpx;
   line-height: 28rpx;
+  margin-top: 4rpx;
   max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-weight: 500;
+  text-align: center;
 }
 .cg-title.trained {
   color: #2e6be6;
@@ -80,11 +74,12 @@
   font-size: 18rpx;
   color: #8a9099;
   line-height: 24rpx;
-  margin-top: 4rpx;
+  margin-top: 2rpx;
   max-width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  text-align: center;
 }
 .cg-cell.future .cg-title,
 .cg-cell.future .cg-volume {
