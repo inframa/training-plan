@@ -43,9 +43,9 @@ Component({
       if (!this._exp) this._exp = {};
       const rows = [];
       if (!multi && allLabel) {
+        rows.push({ path: '__all__', label: allLabel, depth: 0, hasChildren: false, expanded: false, selected: selected === '' });
         rows.push({ path: '__collapse__', label: '全部折叠', virtual: true, icon: '▼', depth: 0, hasChildren: false, expanded: false, selected: false });
         rows.push({ path: '__expand__',   label: '全部展开', virtual: true, icon: '▲', depth: 0, hasChildren: false, expanded: false, selected: false });
-        rows.push({ path: '__all__', label: allLabel, depth: 0, hasChildren: false, expanded: false, selected: selected === '' });
       }
       const walk = (nodes, depth, parentPath) => {
         (nodes || []).forEach((n) => {
