@@ -12,10 +12,10 @@
       <text class="ctree-add-label">添加顶级</text>
     </view>
     <view class="ctree-tool-btn ctree-icon-btn" bindtap="onCollapseAll" hover-class="ctree-icon-btn-hover">
-      <text class="ctree-icon">⛶</text>
+      <text class="ctree-icon">▼</text>
     </view>
     <view class="ctree-tool-btn ctree-icon-btn" bindtap="onExpandAll" hover-class="ctree-icon-btn-hover">
-      <text class="ctree-icon">⤢</text>
+      <text class="ctree-icon">▲</text>
     </view>
   </view>
 
