@@ -104,12 +104,12 @@
 
   <!-- 动作选择弹层：左树右列表 -->
   <view class="mask" wx:if="{{showPicker}}" bindtap="closePicker"></view>
-  <view class="popup tr-picker" wx:if="{{showPicker}}" style="max-height: none">
+  <view class="popup tr-picker {{pickerTreeManaging ? 'tr-picker-managing' : ''}}" wx:if="{{showPicker}}" style="max-height: none">
     <view class="row between" style="margin-bottom: 16rpx">
-      <view class="h2">选择动作</view>
+      <view class="h2">{{pickerTreeManaging ? '管理分类' : '选择动作'}}</view>
       <text class="link danger" bindtap="closePicker">关闭</text>
     </view>
-    <input class="input" placeholder="搜索动作名称" value="{{pickerKeyword}}" bindinput="onPickerKeyword" />
+    <input wx:if="{{!pickerTreeManaging}}" class="input" placeholder="搜索动作名称" value="{{pickerKeyword}}" bindinput="onPickerKeyword" />
     <view class="tr-picker-body">
       <view class="tr-picker-side">
         <category-tree
@@ -119,16 +119,17 @@
           editable
           bind:select="onPickerTreeSelect"
           bind:change="onPickerTreeChange"
+          bind:managingchange="onPickerTreeManagingChange"
         />
       </view>
-      <scroll-view scroll-y class="tr-picker-list">
+      <scroll-view wx:if="{{!pickerTreeManaging}}" scroll-y class="tr-picker-list">
         <action-card wx:for="{{pickerList}}" wx:key="id" action="{{item}}" selected="{{pickerSelected[item.id]}}" bind:cardtap="onPickerTap" />
         <view class="empty" wx:if="{{!pickerList.length}}">
           <view class="muted">没有匹配的动作</view>
         </view>
       </scroll-view>
     </view>
-    <view class="row tr-picker-footer">
+    <view wx:if="{{!pickerTreeManaging}}" class="row tr-picker-footer">
       <view class="btn plain flex1" bindtap="onCreateFromPicker">新建动作</view>
       <view class="btn flex1" style="margin-left: 20rpx" bindtap="confirmPicker">添加已选</view>
     </view>

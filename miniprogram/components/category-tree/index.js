@@ -43,6 +43,8 @@ Component({
       if (!this._exp) this._exp = {};
       const rows = [];
       if (!multi && allLabel) {
+        rows.push({ path: '__collapse__', label: '全部折叠', virtual: true, icon: '▼', depth: 0, hasChildren: false, expanded: false, selected: false });
+        rows.push({ path: '__expand__',   label: '全部展开', virtual: true, icon: '▲', depth: 0, hasChildren: false, expanded: false, selected: false });
         rows.push({ path: '__all__', label: allLabel, depth: 0, hasChildren: false, expanded: false, selected: selected === '' });
       }
       const walk = (nodes, depth, parentPath) => {
@@ -61,8 +63,11 @@ Component({
 
     // ---------- 选择 ----------
     onTap(e) {
-      const { path, label } = e.currentTarget.dataset;
+      const { path } = e.currentTarget.dataset;
       if (this.data.managing || this.data.dragging) return;
+      // 虚拟行不触发 select
+      if (path === '__collapse__' || path === '__expand__') return;
+      const { label } = e.currentTarget.dataset;
       if (!this.data.multi && this._exp && path !== '__all__') {
         if (this._exp[path] === undefined) this._exp[path] = true;
       }
@@ -73,6 +78,16 @@ Component({
       const { path } = e.currentTarget.dataset;
       this._exp[path] = !(this._exp[path] !== false);
       this.rebuild();
+    },
+
+    // 虚拟行点击
+    onToggleVirtual(e) {
+      const { path } = e.currentTarget.dataset;
+      if (path === '__collapse__') {
+        this.onCollapseAll();
+      } else if (path === '__expand__') {
+        this.onExpandAll();
+      }
     },
 
     // ---------- 全部折叠 / 全部展开 ----------
@@ -191,8 +206,10 @@ Component({
     },
 
     onToggleManage() {
-      this.setData({ managing: !this.data.managing });
+      const next = !this.data.managing;
+      this.setData({ managing: next });
       this.rebuild();
+      this.triggerEvent('managingchange', { managing: next });
     },
 
     // ---------- scroll / touch 事件（用于拖拽） ----------

@@ -11,6 +11,13 @@
   height: 100%;
   background: #fff;
   border-right: 1rpx solid #eef0f4;
+  transition: width 0.2s;
+}
+
+/* 管理模式：树占满整个页面 */
+.lib-managing .lib-side {
+  width: 100%;
+  border-right: none;
 }
 .lib-main {
   flex: 1;

@@ -89,6 +89,13 @@
   height: 100%;
   background: #fafbfc;
   border-right: 1rpx solid #eef0f4;
+  transition: width 0.2s;
+}
+
+/* 管理模式：弹层内树占满全宽 */
+.tr-picker-managing .tr-picker-side {
+  width: 100%;
+  border-right: none;
 }
 .tr-picker-list {
   flex: 1;

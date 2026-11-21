@@ -14,7 +14,8 @@ Page({
     showArchived: false,
     list: [],
     loaded: false,
-    gymSheetVisible: false
+    gymSheetVisible: false,
+    treeManaging: false
   },
   unsub: null,
 
@@ -74,6 +75,10 @@ Page({
 
   onTreeReset() {
     this.setData({ partTree: store.getPartTree(), part: '' }, () => this.rebuild());
+  },
+
+  onTreeManagingChange(e) {
+    this.setData({ treeManaging: e.detail.managing });
   },
 
   onToggleArchived(e) {

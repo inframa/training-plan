@@ -41,7 +41,8 @@ Page({
     batchReps: '',
     // 删除单组撤销
     undo: null,
-    undoText: ''
+    undoText: '',
+    pickerTreeManaging: false
   },
 
   record: null,
@@ -251,6 +252,10 @@ Page({
   onPickerTreeChange(e) {
     store.setPartTree(e.detail.tree);
     this.setData({ partTree: store.getPartTree() }, () => this.buildPickerList());
+  },
+
+  onPickerTreeManagingChange(e) {
+    this.setData({ pickerTreeManaging: e.detail.managing });
   },
 
   onPickerTap(e) {
