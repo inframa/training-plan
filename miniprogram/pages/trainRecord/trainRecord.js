@@ -463,12 +463,14 @@ Page({
   // 重量点击 → 计算器
   onWeightTap(e) {
     const { ai, si } = e.currentTarget.dataset;
-    const set = this.record.dayActions[ai].sets[si];
-    this.setData({ calcVisible: true, calcAi: ai, calcSi: si, calcValue: set.weight || '' });
+    const a = parseInt(ai, 10);
+    const s = parseInt(si, 10);
+    const set = this.record.dayActions[a].sets[s];
+    this.setData({ calcVisible: true, calcAi: a, calcSi: s, calcValue: set.weight || '' });
   },
 
   onCalcConfirm(e) {
-    const { ai, si } = this.data;
+    const { calcAi: ai, calcSi: si } = this.data;
     if (ai < 0 || si < 0) return;
     const v = (e.detail.value || '').trim();
     this.record.dayActions[ai].sets[si].weight = v;
