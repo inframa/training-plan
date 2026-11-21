@@ -45,16 +45,21 @@
   color: #2E6BE6;
 }
 
-/* 「添加顶级」行 */
-.ctree-row.is-add {
-  justify-content: center;
-  height: 68rpx;
-  color: #2E6BE6;
-  font-size: 26rpx;
+/* 「添加根节点」按钮（管理模式下显示在「全部」行右侧） */
+.ctree-add-root {
+  flex-shrink: 0;
+  width: 48rpx;
+  height: 48rpx;
+  line-height: 44rpx;
+  text-align: center;
+  border-radius: 50%;
+  font-size: 30rpx;
+  color: #fff;
+  background: #1D4ED8;
 }
 
-.ctree-row.is-add:active {
-  background: #EDF3FE;
+.ctree-add-root:active {
+  background: #1E40AF;
 }
 
 .ctree-row.is-dragging {
