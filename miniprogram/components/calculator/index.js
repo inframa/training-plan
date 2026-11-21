@@ -8,14 +8,24 @@ function evalExpr(s) {
 
   let pos = 0;
 
-  // 解析数字（含小数，可带前导负号）
+  // 解析数字（含小数，可带前导负号，最多一个小数点）
   function parseNum() {
     let sign = 1;
     if (s[pos] === '-') { sign = -1; pos++; }
     else if (s[pos] === '+') { pos++; }
     const start = pos;
-    while (pos < s.length && (/\d/.test(s[pos]) || s[pos] === '.')) pos++;
-    if (pos === start) return null; // 没数字
+    let hasDot = false;
+    while (pos < s.length) {
+      if (/\d/.test(s[pos])) {
+        pos++;
+      } else if (s[pos] === '.' && !hasDot) {
+        hasDot = true;
+        pos++;
+      } else {
+        break;
+      }
+    }
+    if (pos === start) return null;
     const n = parseFloat(s.slice(start, pos));
     if (isNaN(n)) return null;
     return sign * n;
