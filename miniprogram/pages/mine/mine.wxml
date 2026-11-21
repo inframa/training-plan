@@ -1,0 +1,63 @@
+<view class="page mine">
+  <!-- 用户信息卡 -->
+  <view class="card mine-user">
+    <view class="mine-avatar">我</view>
+    <view class="mine-user-info">
+      <view class="h2">健身爱好者</view>
+      <view class="muted">ID：{{openid}}</view>
+    </view>
+  </view>
+
+  <!-- 训练统计 -->
+  <view class="card">
+    <view class="h2" style="margin-bottom: 24rpx">训练统计</view>
+    <view class="mine-stats">
+      <view class="mine-stat">
+        <view class="num">{{trainingDays}}</view>
+        <view class="muted">已训练天数</view>
+      </view>
+      <view class="mine-stat">
+        <view class="num">{{totalVolume}}</view>
+        <view class="muted">累计容量 kg·次</view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 同步状态 -->
+  <view class="card">
+    <view class="h2" style="margin-bottom: 24rpx">数据同步</view>
+    <view class="mine-row row between">
+      <text class="muted">同步状态</text>
+      <text class="mine-sync {{syncStatus === '已同步' ? 'ok' : 'pending'}}">{{syncStatus}}</text>
+    </view>
+    <view class="mine-row row between">
+      <text class="muted">最后登录</text>
+      <text class="muted">{{lastLogin}}</text>
+    </view>
+    <view class="btn plain" style="margin-top: 16rpx" bindtap="onRetrySync">立即同步</view>
+  </view>
+
+  <!-- 设置 -->
+  <view class="card">
+    <view class="h2" style="margin-bottom: 24rpx">设置</view>
+    <view class="mine-row row between" bindtap="onManagePartTree">
+      <text>身体部位分类管理</text>
+      <text class="muted">›</text>
+    </view>
+    <view class="mine-row row between" bindtap="onRetrySync">
+      <text>同步待上传数据</text>
+      <text class="muted">›</text>
+    </view>
+    <view class="mine-row row between" bindtap="onClearCache">
+      <text class="danger">清除本地缓存</text>
+      <text class="muted">›</text>
+    </view>
+  </view>
+
+  <view class="card">
+    <view class="mine-row row between" bindtap="onAbout">
+      <text>关于</text>
+      <text class="muted">v1.0 ›</text>
+    </view>
+  </view>
+</view>

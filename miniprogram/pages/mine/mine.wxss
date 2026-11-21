@@ -1,0 +1,63 @@
+.mine-user {
+  display: flex;
+  align-items: center;
+  gap: 24rpx;
+  background: linear-gradient(135deg, #2e6be6, #5c8af5);
+  color: #fff;
+}
+.mine-user .h2 {
+  color: #fff;
+}
+.mine-user .muted {
+  color: rgba(255, 255, 255, 0.75);
+}
+.mine-avatar {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.25);
+  color: #fff;
+  font-size: 36rpx;
+  font-weight: 600;
+  text-align: center;
+  line-height: 96rpx;
+}
+.mine-stats {
+  display: flex;
+  gap: 24rpx;
+}
+.mine-stat {
+  flex: 1;
+  text-align: center;
+  padding: 16rpx 0;
+  background: #f7f9fc;
+  border-radius: 16rpx;
+}
+.mine-stat .num {
+  font-size: 44rpx;
+  color: #2e6be6;
+}
+.mine-row {
+  padding: 20rpx 0;
+  border-bottom: 1rpx solid #f0f1f5;
+  font-size: 28rpx;
+}
+.mine-row:last-child {
+  border-bottom: none;
+}
+.mine-row.danger {
+  color: #e5484d;
+}
+.mine-sync {
+  font-size: 24rpx;
+  padding: 4rpx 16rpx;
+  border-radius: 999rpx;
+}
+.mine-sync.ok {
+  background: #e5f5eb;
+  color: #2ba471;
+}
+.mine-sync.pending {
+  background: #fef0e1;
+  color: #e6912e;
+}

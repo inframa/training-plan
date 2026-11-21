@@ -1,0 +1,33 @@
+<view class="page pt">
+  <view class="pt-section-title">
+    <view class="h2">预设模板</view>
+    <view class="muted">选择一个开始你的训练循环</view>
+  </view>
+  <view class="pt-grid">
+    <view
+      class="pt-card"
+      wx:for="{{presetList}}"
+      wx:key="id"
+      data-id="{{item.id}}"
+      data-name="{{item.name}}"
+      bindtap="onPresetTap"
+    >
+      <view class="pt-color" style="background: {{item.color}}"></view>
+      <view class="pt-card-name">{{item.name}}</view>
+      <view class="muted pt-card-desc">{{item.desc}}</view>
+    </view>
+  </view>
+
+  <view class="pt-section-title row between" style="margin-top: 48rpx">
+    <view class="h2">我的模板</view>
+    <text class="link" bindtap="onCreateTemplate">＋ 新建</text>
+  </view>
+  <view class="card" wx:if="{{myTemplates.length === 0}}">
+    <view class="empty" style="padding: 60rpx 0">
+      <view class="empty-title">还没有自定义模板</view>
+      <view class="muted">预设模板也可以直接使用</view>
+    </view>
+  </view>
+
+  <view class="muted pt-tip">训练计划模板功能持续开发中，敬请期待…</view>
+</view>

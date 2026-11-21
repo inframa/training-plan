@@ -2,6 +2,8 @@
   "pages": [
     "pages/calendar/calendar",
     "pages/actionLibrary/actionLibrary",
+    "pages/planTemplate/planTemplate",
+    "pages/mine/mine",
     "pages/trainRecord/trainRecord",
     "pages/actionEdit/actionEdit",
     "pages/actionDetail/actionDetail"
@@ -30,6 +32,14 @@
         "text": "动作库",
         "iconPath": "images/tab/library.png",
         "selectedIconPath": "images/tab/library-active.png"
+      },
+      {
+        "pagePath": "pages/planTemplate/planTemplate",
+        "text": "训练计划"
+      },
+      {
+        "pagePath": "pages/mine/mine",
+        "text": "我的"
       }
     ]
   },
