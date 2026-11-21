@@ -1,14 +1,59 @@
 // 计算器输入弹窗：数字键 + 加减乘除，底部弹出小半屏，用于录入重量
+// 注意：微信小程序禁用 eval / Function，故手写四则运算解析器
 function evalExpr(s) {
   if (!s || !/^[\d+\-*/. ]+$/.test(s)) return null;
-  try {
-    // 输入已通过白名单校验，仅数字与四则运算符
-    const r = Function('"use strict";return (' + s + ')')();
-    if (typeof r !== 'number' || !isFinite(r)) return null;
-    return Math.round(r * 100) / 100;
-  } catch (e) {
-    return null;
+  // 把连续空格去掉
+  s = s.replace(/\s+/g, '');
+  if (!s) return null;
+
+  let pos = 0;
+
+  // 解析数字（含小数，可带前导负号）
+  function parseNum() {
+    let sign = 1;
+    if (s[pos] === '-') { sign = -1; pos++; }
+    else if (s[pos] === '+') { pos++; }
+    const start = pos;
+    while (pos < s.length && (/\d/.test(s[pos]) || s[pos] === '.')) pos++;
+    if (pos === start) return null; // 没数字
+    const n = parseFloat(s.slice(start, pos));
+    if (isNaN(n)) return null;
+    return sign * n;
   }
+
+  // 乘除：* /
+  function parseTerm() {
+    let left = parseNum();
+    if (left === null) return null;
+    while (pos < s.length && (s[pos] === '*' || s[pos] === '/')) {
+      const op = s[pos++];
+      const right = parseNum();
+      if (right === null) return null;
+      if (op === '*') left = left * right;
+      else {
+        if (right === 0) return null;
+        left = left / right;
+      }
+    }
+    return left;
+  }
+
+  // 加减：+ -
+  function parseExpr() {
+    let left = parseTerm();
+    if (left === null) return null;
+    while (pos < s.length && (s[pos] === '+' || s[pos] === '-')) {
+      const op = s[pos++];
+      const right = parseTerm();
+      if (right === null) return null;
+      left = op === '+' ? left + right : left - right;
+    }
+    return left;
+  }
+
+  const result = parseExpr();
+  if (result === null || pos !== s.length || !isFinite(result)) return null;
+  return Math.round(result * 100) / 100;
 }
 
 Component({
