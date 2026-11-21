@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>反馈管理后台</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif; background: #f5f6fa; color: #1f2329; }
+  .wrap { max-width: 960px; margin: 0 auto; padding: 24px 16px; }
+  h1 { font-size: 22px; font-weight: 600; margin-bottom: 16px; }
+
+  /* 连接区 */
+  .connect { background: #fff; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); margin-bottom: 16px; }
+  .connect-row { display: flex; gap: 10px; margin-bottom: 10px; align-items: center; }
+  .connect-row:last-child { margin-bottom: 0; }
+  .connect label { font-size: 13px; color: #646a73; min-width: 90px; }
+  .connect input { flex: 1; padding: 8px 12px; border: 1px solid #e5e6eb; border-radius: 8px; font-size: 13px; }
+  .connect input:focus { outline: none; border-color: #2e6be6; }
+  .btn { padding: 8px 18px; border-radius: 8px; border: none; font-size: 13px; cursor: pointer; background: #2e6be6; color: #fff; }
+  .btn:hover { background: #1e5ad6; }
+  .btn.gray { background: #f2f3f7; color: #4a5058; }
+  .btn.gray:hover { background: #e8e9ef; }
+  .btn.danger { background: #e5484d; }
+  .btn.danger:hover { background: #d03d42; }
+  .btn.sm { padding: 5px 12px; font-size: 12px; }
+  .status-badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-size: 12px; }
+  .status-badge.pending { background: #fef0e1; color: #e6912e; }
+  .status-badge.resolved { background: #e5f5eb; color: #2ba471; }
+  .conn-status { font-size: 12px; margin-left: auto; }
+  .conn-status.ok { color: #2ba471; }
+  .conn-status.err { color: #e5484d; }
+
+  /* Tabs */
+  .tabs { display: flex; gap: 4px; background: #fff; border-radius: 10px; padding: 4px; margin-bottom: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .tab { flex: 1; text-align: center; padding: 10px 0; border-radius: 8px; font-size: 14px; cursor: pointer; color: #4a5058; }
+  .tab.active { background: #2e6be6; color: #fff; font-weight: 500; }
+
+  /* 列表 */
+  .empty { text-align: center; padding: 60px 0; color: #9aa3ae; font-size: 14px; }
+  .item { background: #fff; border-radius: 12px; padding: 16px 20px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+  .item-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+  .type-tag { font-size: 12px; padding: 3px 10px; border-radius: 999px; }
+  .type-tag.bug { background: #fdeced; color: #e5484d; }
+  .type-tag.feature { background: #e6f0ff; color: #2e6be6; }
+  .type-tag.experience { background: #fef0e1; color: #e6912e; }
+  .type-tag.other { background: #f2f3f7; color: #8a9099; }
+  .item-meta { font-size: 12px; color: #9aa3ae; margin-left: auto; }
+  .item-content { font-size: 14px; line-height: 1.6; background: #f7f9fc; border-radius: 8px; padding: 12px 14px; margin: 10px 0; cursor: pointer; word-break: break-all; }
+  .item-content:hover { background: #eef2fb; }
+  .item-contact { font-size: 12px; color: #646a73; margin-bottom: 6px; }
+  .item-actions { display: flex; gap: 8px; margin-top: 10px; }
+  .loading { text-align: center; padding: 40px; color: #9aa3ae; }
+  .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.8); color: #fff; padding: 10px 20px; border-radius: 8px; font-size: 13px; z-index: 9999; opacity: 0; transition: opacity 0.2s; }
+  .toast.show { opacity: 1; }
+  .refresh-btn { margin-left: auto; }
+  .toolbar { display: flex; align-items: center; margin-bottom: 12px; }
+  .tip { font-size: 12px; color: #9aa3ae; margin-top: 8px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>📋 反馈管理后台</h1>
+
+  <!-- 连接配置 -->
+  <div class="connect" id="connectBox">
+    <div class="connect-row">
+      <label>环境 ID</label>
+      <input id="envIdInput" placeholder="cloud1-xxxxxxxxxx" />
+    </div>
+    <div class="connect-row">
+      <label>管理密钥</label>
+      <input id="adminKeyInput" type="password" placeholder="feedback 云函数 ADMIN_KEY" />
+    </div>
+    <div class="connect-row">
+      <button class="btn" id="initBtn">连接云开发</button>
+      <span class="conn-status" id="connStatus">未连接</span>
+    </div>
+    <div class="tip">首次使用需在云开发控制台开启「匿名登录」和配置「Web 安全域名」</div>
+  </div>
+
+  <!-- 操作区 -->
+  <div class="toolbar" id="toolbar" style="display:none">
+    <div class="tabs">
+      <div class="tab active" data-tab="all">全部 <span id="cntAll"></span></div>
+      <div class="tab" data-tab="pending">待处理 <span id="cntPending"></span></div>
+      <div class="tab" data-tab="resolved">已处理 <span id="cntResolved"></span></div>
+    </div>
+    <button class="btn gray sm refresh-btn" id="refreshBtn">🔄 刷新</button>
+  </div>
+
+  <!-- 列表 -->
+  <div id="listArea"></div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- 微信云开发 Web SDK CDN -->
+<script src="https://cdn.jsdelivr.net/npm/@cloudbase/js-sdk@1.9.7/dist/cloudbase.full.js"></script>
+<script>
+(function() {
+  let app = null;
+  let connected = false;
+  let currentTab = 'all';
+  let allList = [];
+
+  // 读取 localStorage
+  const savedEnv = localStorage.getItem('fb_envId') || '';
+  const savedKey = localStorage.getItem('fb_adminKey') || '';
+  document.getElementById('envIdInput').value = savedEnv;
+  document.getElementById('adminKeyInput').value = savedKey;
+
+  // Toast
+  function toast(msg, ms) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.classList.add('show');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), ms || 1800);
+  }
+
+  // 显示/隐藏 连接区
+  function showConnected(ok, msg) {
+    const status = document.getElementById('connStatus');
+    status.textContent = msg;
+    status.className = 'conn-status ' + (ok ? 'ok' : 'err');
+    document.getElementById('toolbar').style.display = ok ? 'flex' : 'none';
+    if (ok) {
+      document.getElementById('connectBox').style.opacity = '0.6';
+      document.getElementById('envIdInput').disabled = true;
+      document.getElementById('adminKeyInput').disabled = true;
+      document.getElementById('initBtn').disabled = true;
+      document.getElementById('initBtn').textContent = '已连接';
+    }
+  }
+
+  // 初始化云开发
+  document.getElementById('initBtn').addEventListener('click', async () => {
+    const envId = document.getElementById('envIdInput').value.trim();
+    const adminKey = document.getElementById('adminKeyInput').value.trim();
+    if (!envId) { toast('请输入环境 ID'); return; }
+    if (!adminKey) { toast('请输入管理密钥'); return; }
+
+    localStorage.setItem('fb_envId', envId);
+    localStorage.setItem('fb_adminKey', adminKey);
+
+    showConnected(false, '连接中…');
+    try {
+      app = cloudbase.init({ env: envId });
+      await app.auth().signInAnonymously();
+      connected = true;
+      showConnected(true, '✅ 已连接');
+      await refresh();
+    } catch (e) {
+      console.error(e);
+      showConnected(false, '❌ ' + (e.message || '连接失败'));
+      toast('连接失败：' + (e.message || '请检查环境 ID 和匿名登录配置'));
+    }
+  });
+
+  // 调用云函数
+  async function callFeedback(action, payload) {
+    const key = document.getElementById('adminKeyInput').value.trim();
+    const data = Object.assign({ action, adminKey: key }, payload || {});
+    const r = await app.callFunction({ name: 'feedback', data });
+    const res = r.result;
+    if (!res || res.code !== 0) {
+      throw new Error((res && res.message) || '未知错误');
+    }
+    return res.data;
+  }
+
+  // 刷列表
+  async function refresh() {
+    if (!connected) return;
+    document.getElementById('listArea').innerHTML = '<div class="loading">加载中…</div>';
+    try {
+      const list = await callFeedback('listAll');
+      allList = list || [];
+      renderList();
+    } catch (e) {
+      console.error(e);
+      document.getElementById('listArea').innerHTML = '<div class="empty">加载失败：' + e.message + '</div>';
+    }
+  }
+
+  function typeLabel(t) {
+    return { bug: 'Bug', feature: '建议', experience: '体验', other: '其他' }[t] || '其他';
+  }
+
+  function formatTime(ts) {
+    if (!ts) return '';
+    const d = new Date(ts);
+    const pad = n => (n < 10 ? '0' + n : '' + n);
+    return d.getFullYear() + '-' + pad(d.getMonth()+1) + '-' + pad(d.getDate()) + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+  }
+
+  function renderList() {
+    // 计数
+    const pendingCnt = allList.filter(x => x.status === 'pending').length;
+    const resolvedCnt = allList.filter(x => x.status === 'resolved').length;
+    document.getElementById('cntAll').textContent = allList.length ? `(${allList.length})` : '';
+    document.getElementById('cntPending').textContent = pendingCnt ? `(${pendingCnt})` : '';
+    document.getElementById('cntResolved').textContent = resolvedCnt ? `(${resolvedCnt})` : '';
+
+    // 筛选
+    const list = currentTab === 'all' ? allList : allList.filter(x => x.status === currentTab);
+
+    const area = document.getElementById('listArea');
+    if (!list.length) {
+      area.innerHTML = '<div class="empty">当前分类下暂无反馈</div>';
+      return;
+    }
+
+    area.innerHTML = list.map(item => `
+      <div class="item">
+        <div class="item-head">
+          <span class="type-tag ${item.type}">${typeLabel(item.type)}</span>
+          <span class="status-badge ${item.status}">${item.status === 'resolved' ? '已处理' : '待处理'}</span>
+          <span class="item-meta">${formatTime(item.createdAt)}</span>
+        </div>
+        <div class="item-content" data-content="${escapeAttr(item.content)}">${escapeHtml(item.content)}</div>
+        <div class="item-contact">用户 ${item.openidMask}${item.contact ? ' · 联系方式：' + escapeHtml(item.contact) : ''}${item.resolvedAt ? ' · 处理于 ' + formatTime(item.resolvedAt) : ''}</div>
+        <div class="item-actions">
+          <button class="btn gray sm" data-action="toggle" data-id="${item._id}" data-status="${item.status}">${item.status === 'resolved' ? '标记待处理' : '标记已处理'}</button>
+          <button class="btn danger sm" data-action="delete" data-id="${item._id}">删除</button>
+        </div>
+      </div>
+    `).join('');
+
+    // 绑定事件
+    area.querySelectorAll('.item-content').forEach(el => {
+      el.addEventListener('click', () => {
+        navigator.clipboard.writeText(el.dataset.content).then(() => toast('内容已复制'));
+      });
+    });
+    area.querySelectorAll('button[data-action]').forEach(btn => {
+      btn.addEventListener('click', () => handleAction(btn.dataset.action, btn.dataset));
+    });
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  }
+  function escapeAttr(s) { return escapeHtml(s).replace(/"/g, '&quot;'); }
+
+  async function handleAction(action, d) {
+    if (action === 'toggle') {
+      const nextStatus = d.status === 'resolved' ? 'pending' : 'resolved';
+      try {
+        await callFeedback('markResolved', { id: d.id, status: nextStatus });
+        toast('已更新');
+        await refresh();
+      } catch (e) { toast('操作失败：' + e.message); }
+    } else if (action === 'delete') {
+      if (!confirm('确定删除这条反馈吗？不可恢复。')) return;
+      try {
+        await callFeedback('delete', { id: d.id });
+        toast('已删除');
+        await refresh();
+      } catch (e) { toast('删除失败：' + e.message); }
+    }
+  }
+
+  // Tabs
+  document.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+      t.classList.add('active');
+      currentTab = t.dataset.tab;
+      renderList();
+    });
+  });
+
+  document.getElementById('refreshBtn').addEventListener('click', refresh);
+})();
+</script>
+</body>
+</html>
