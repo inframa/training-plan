@@ -1,15 +1,11 @@
-// 反馈云函数：submit / list / listAll / markResolved / delete / checkAdmin
+// 反馈云函数：submit / list / listAll / markResolved / delete / checkAdmin / reply / stats
 // 管理员鉴权：小程序端用 openid 白名单，Web 端用 ADMIN_KEY
 const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
+const _ = db.command;
 
-// ====== 管理员配置 ======
-// 方式 1：小程序端管理员 openid 白名单
-const ADMIN_OPENIDS = [
-  // 例如：'oXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
-];
-// 方式 2：Web 端管理台调用密钥（自行生成随机字符串，Web 端和云函数都要配）
+const ADMIN_OPENIDS = []; // 例如：'oXXXXXXXXXXXXXXXXXXXXXXXXXXXX'
 const ADMIN_KEY = 'change-me-please-2026';
 
 function isAdmin(openid, key) {
@@ -17,7 +13,6 @@ function isAdmin(openid, key) {
   if (openid && ADMIN_OPENIDS.indexOf(openid) >= 0) return true;
   return false;
 }
-
 function requireAdmin(openid, key) {
   if (!isAdmin(openid, key)) return { code: 403, message: '无权限' };
   return null;
@@ -29,18 +24,19 @@ async function submit(openid, data, submitterOverride) {
   const type = data.type || 'other';
   if (!content) return { code: 400, message: '反馈内容不能为空' };
   if (content.length > 1000) return { code: 400, message: '内容过长（最多1000字）' };
-  // submitter：优先用 Web 端传入的 submitter，否则用 openid
   const submitter = submitterOverride || openid || 'unknown';
   const r = await db.collection('feedback').add({
     data: {
-      _openid: openid || '', // 小程序会自动补，Web 端为空
+      _openid: openid || '',
       submitter,
       type,
       content,
       contact,
       status: 'pending',
       createdAt: Date.now(),
-      resolvedAt: null
+      resolvedAt: null,
+      adminReply: '',
+      repliedAt: null
     }
   });
   return { code: 0, message: 'ok', data: { id: r._id } };
@@ -61,8 +57,12 @@ async function listAll(data, key) {
   const denied = requireAdmin(null, key);
   if (denied) return denied;
   const status = data && data.status;
+  const type = data && data.type;
+  const keyword = data && data.keyword;
   let query = {};
   if (status) query.status = status;
+  if (type) query.type = type;
+  if (keyword) query.content = db.RegExp({ regexp: keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), options: 'i' });
   const limit = Math.min(500, (data && data.limit) || 100);
   const res = await db.collection('feedback')
     .where(query)
@@ -83,10 +83,36 @@ async function markResolved(data, key) {
   if (denied) return denied;
   if (!data || !data.id) return { code: 400, message: '缺少 id' };
   const status = data.status === 'pending' ? 'resolved' : 'pending';
-  await db.collection('feedback').doc(data.id).update({
-    data: { status, resolvedAt: status === 'resolved' ? Date.now() : null }
-  });
+  const updateData = { status, resolvedAt: status === 'resolved' ? Date.now() : null };
+  // 如果标记已处理但还没有回复，自动补一条默认回复
+  if (status === 'resolved' && !data.skipAutoReply) {
+    const cur = await db.collection('feedback').doc(data.id).get().catch(() => null);
+    if (cur && cur.data && !cur.data.adminReply) {
+      updateData.adminReply = '感谢你的反馈，已处理！';
+      updateData.repliedAt = Date.now();
+    }
+  }
+  await db.collection('feedback').doc(data.id).update({ data: updateData });
   return { code: 0, message: 'ok', data: { status } };
+}
+
+async function reply(data, key) {
+  const denied = requireAdmin(null, key);
+  if (denied) return denied;
+  if (!data || !data.id) return { code: 400, message: '缺少 id' };
+  const replyText = (data.reply || '').trim();
+  if (!replyText) return { code: 400, message: '回复内容不能为空' };
+  if (replyText.length > 500) return { code: 400, message: '回复过长（最多500字）' };
+  await db.collection('feedback').doc(data.id).update({
+    data: {
+      adminReply: replyText,
+      repliedAt: Date.now(),
+      // 有回复自动标记已处理
+      status: 'resolved',
+      resolvedAt: Date.now()
+    }
+  });
+  return { code: 0, message: 'ok' };
 }
 
 async function del(data, key) {
@@ -95,6 +121,23 @@ async function del(data, key) {
   if (!data || !data.id) return { code: 400, message: '缺少 id' };
   await db.collection('feedback').doc(data.id).remove();
   return { code: 0, message: 'ok' };
+}
+
+async function stats(key) {
+  const denied = requireAdmin(null, key);
+  if (denied) return denied;
+  const countAll = (await db.collection('feedback').count()).total;
+  const countPending = (await db.collection('feedback').where({ status: 'pending' }).count()).total;
+  const countResolved = (await db.collection('feedback').where({ status: 'resolved' }).count()).total;
+  const types = ['bug', 'feature', 'experience', 'other'];
+  const typeStats = {};
+  for (const t of types) {
+    typeStats[t] = (await db.collection('feedback').where({ type: t }).count()).total;
+  }
+  return {
+    code: 0, message: 'ok',
+    data: { total: countAll, pending: countPending, resolved: countResolved, byType: typeStats }
+  };
 }
 
 async function checkAdmin(openid, key) {
@@ -107,10 +150,7 @@ exports.main = async (event) => {
   const payload = event.payload || event.data || {};
   const adminKey = payload.adminKey || event.adminKey || '';
 
-  // 不需要登录的 action
   if (action === 'checkAdmin') return checkAdmin(OPENID, adminKey);
-
-  // submit / list 允许 Web 端无 openid 调用（通过 submitter 字段）
   if (!OPENID && !payload.submitter && !adminKey && action !== 'submit' && action !== 'list') {
     return { code: 1001, message: '未登录' };
   }
@@ -121,7 +161,9 @@ exports.main = async (event) => {
       case 'list': return listMine(OPENID, payload.submitter);
       case 'listAll': return listAll(payload, adminKey);
       case 'markResolved': return markResolved(payload, adminKey);
+      case 'reply': return reply(payload, adminKey);
       case 'delete': return del(payload, adminKey);
+      case 'stats': return stats(adminKey);
       default: return { code: 404, message: '未知 action: ' + action };
     }
   } catch (e) {

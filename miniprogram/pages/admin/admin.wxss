@@ -1,3 +1,76 @@
+/* === 统计面板 === */
+.admin-stats { padding: 24rpx; }
+.admin-stats .h2 { margin-bottom: 20rpx; }
+.stat-row {
+  display: flex;
+  gap: 20rpx;
+}
+.stat-item {
+  flex: 1;
+  text-align: center;
+  background: #f7f9fc;
+  border-radius: 12rpx;
+  padding: 16rpx 0;
+}
+.stat-num { font-size: 44rpx; font-weight: 700; color: #2e6be6; }
+.stat-num.orange { color: #e6912e; }
+.stat-num.green { color: #2ba471; }
+.stat-types {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16rpx;
+  margin-top: 16rpx;
+}
+.stat-type {
+  font-size: 24rpx;
+  color: #4a5058;
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+/* === 搜索 === */
+.admin-search { padding: 16rpx 20rpx; }
+.search-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #f5f6fa;
+  border-radius: 999rpx;
+  padding: 0 24rpx;
+  height: 68rpx;
+}
+.search-input {
+  flex: 1;
+  font-size: 26rpx;
+  height: 68rpx;
+}
+.search-clear {
+  color: #9aa3ae;
+  font-size: 28rpx;
+  padding: 0 10rpx;
+}
+
+/* === 类型筛选 === */
+.type-scroll {
+  white-space: nowrap;
+  padding: 0 4rpx;
+  margin-bottom: 16rpx;
+}
+.type-chip {
+  display: inline-block;
+  padding: 10rpx 28rpx;
+  margin-right: 14rpx;
+  border-radius: 999rpx;
+  font-size: 26rpx;
+  background: #f2f3f7;
+  color: #4a5058;
+}
+.type-chip.on {
+  background: #2e6be6;
+  color: #fff;
+}
+
+/* === Tabs === */
 .admin-tabs {
   display: flex;
   background: #fff;
@@ -19,9 +92,11 @@
   color: #fff;
   font-weight: 500;
 }
-.admin-item {
-  padding: 24rpx;
-}
+
+/* === 条目 === */
+.admin-item { padding: 24rpx; }
+.admin-expand { font-size: 22rpx; color: #9aa3ae; }
+.admin-expand.on { color: #2e6be6; }
 .admin-content {
   font-size: 28rpx;
   line-height: 1.5;
@@ -32,11 +107,57 @@
   padding: 14rpx 16rpx;
   word-break: break-all;
 }
+.admin-detail {
+  border-top: 1rpx dashed #e5e6eb;
+  padding-top: 16rpx;
+  margin-top: 8rpx;
+}
 .admin-meta {
   display: flex;
   gap: 24rpx;
   margin-bottom: 8rpx;
+  font-size: 26rpx;
 }
+.admin-meta .muted { font-size: 24rpx; }
+.admin-meta .link.sm { font-size: 22rpx; color: #2e6be6; }
+
+/* === 管理员回复展示 === */
+.admin-reply-block {
+  background: #eaf0fe;
+  border-radius: 10rpx;
+  padding: 14rpx 16rpx;
+  margin: 14rpx 0;
+  border-left: 4rpx solid #2e6be6;
+}
+.admin-reply-label {
+  font-size: 22rpx;
+  color: #2e6be6;
+  font-weight: 600;
+  margin-bottom: 6rpx;
+}
+.admin-reply-text {
+  font-size: 26rpx;
+  line-height: 1.5;
+  color: #1f2329;
+}
+.admin-reply-block .muted.sm { font-size: 22rpx; margin-top: 6rpx; }
+
+/* === 回复输入 === */
+.admin-reply-input-wrap {
+  margin-top: 14rpx;
+}
+.admin-reply-input {
+  background: #f7f9fc;
+  border-radius: 10rpx;
+  padding: 12rpx 14rpx;
+  font-size: 26rpx;
+  width: 100%;
+  min-height: 140rpx;
+  margin-bottom: 10rpx;
+  box-sizing: border-box;
+}
+
+/* === 操作按钮 === */
 .admin-actions {
   display: flex;
   gap: 16rpx;
@@ -47,11 +168,17 @@
   font-size: 24rpx;
   min-width: auto;
 }
-.btn.danger {
-  background: #e5484d;
-  color: #fff;
-}
-.btn.plain {
-  background: #eef2fb;
-  color: #2e6be6;
-}
+.btn.danger { background: #e5484d; color: #fff; }
+.btn.plain { background: #eef2fb; color: #2e6be6; }
+.btn.sm { padding: 8rpx 20rpx; font-size: 24rpx; }
+.link.sm { font-size: 22rpx; }
+
+/* 复用 fb-type-tag / fb-status 样式 */
+.fb-type-tag { font-size: 22rpx; padding: 4rpx 16rpx; border-radius: 999rpx; }
+.fb-type-tag.bug { background: #fdeced; color: #e5484d; }
+.fb-type-tag.feature { background: #e6f0ff; color: #2e6be6; }
+.fb-type-tag.experience { background: #fef0e1; color: #e6912e; }
+.fb-type-tag.other { background: #f2f3f7; color: #8a9099; }
+.fb-status { font-size: 22rpx; padding: 4rpx 14rpx; border-radius: 999rpx; }
+.fb-status.pending { background: #fef0e1; color: #e6912e; }
+.fb-status.resolved { background: #e5f5eb; color: #2ba471; }

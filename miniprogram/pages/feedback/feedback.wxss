@@ -54,3 +54,21 @@
 .fb-meta {
   margin-top: 10rpx;
 }
+.fb-reply {
+  background: #eaf0fe;
+  border-radius: 10rpx;
+  padding: 12rpx 14rpx;
+  margin: 12rpx 0 6rpx;
+  border-left: 4rpx solid #2e6be6;
+}
+.fb-reply-label {
+  font-size: 22rpx;
+  color: #2e6be6;
+  font-weight: 600;
+  margin-bottom: 4rpx;
+}
+.fb-reply-text {
+  font-size: 26rpx;
+  line-height: 1.5;
+  color: #1f2329;
+}

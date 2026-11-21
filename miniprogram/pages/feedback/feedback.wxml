@@ -37,6 +37,12 @@
           <text class="fb-status {{item.status}}">{{item.resolvedLabel}}</text>
         </view>
         <view class="fb-content">{{item.content}}</view>
+        <!-- 管理员回复（如果有） -->
+        <view wx:if="{{item.adminReply}}" class="fb-reply">
+          <view class="fb-reply-label">👨‍💼 管理员回复</view>
+          <view class="fb-reply-text">{{item.adminReply}}</view>
+          <view wx:if="{{item.repliedTimeLabel}}" class="muted" style="font-size:22rpx;margin-top:4rpx">{{item.repliedTimeLabel}}</view>
+        </view>
         <view class="row between fb-meta">
           <text class="muted">{{item.timeLabel}}</text>
           <text class="muted" wx:if="{{item.contact}}">联系方式：{{item.contact}}</text>

@@ -60,7 +60,8 @@ Page({
         ...f,
         typeLabel: (this.data.types.find((t) => t.id === f.type) || { label: '其他' }).label,
         timeLabel: dateUtil.formatTime(f.createdAt),
-        resolvedLabel: f.status === 'resolved' ? '已处理' : '待处理'
+        resolvedLabel: f.status === 'resolved' ? '已处理' : '待处理',
+        repliedTimeLabel: f.repliedAt ? dateUtil.formatTime(f.repliedAt) : ''
       }));
       this.setData({ myList: enriched });
     } catch (e) {

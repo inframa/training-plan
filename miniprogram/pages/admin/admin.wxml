@@ -7,6 +7,48 @@
   </view>
 
   <block wx:if="{{isAdmin}}">
+    <!-- 统计面板 -->
+    <view class="card admin-stats" wx:if="{{stats}}">
+      <view class="h2" style="margin-bottom: 20rpx">📊 反馈概览</view>
+      <view class="stat-row">
+        <view class="stat-item">
+          <view class="stat-num">{{stats.total}}</view>
+          <view class="muted">全部</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-num orange">{{stats.pending}}</view>
+          <view class="muted">待处理</view>
+        </view>
+        <view class="stat-item">
+          <view class="stat-num green">{{stats.resolved}}</view>
+          <view class="muted">已处理</view>
+        </view>
+      </view>
+      <view class="stat-types">
+        <view class="stat-type"><text class="fb-type-tag bug">Bug</text> {{stats.byType.bug || 0}}</view>
+        <view class="stat-type"><text class="fb-type-tag feature">建议</text> {{stats.byType.feature || 0}}</view>
+        <view class="stat-type"><text class="fb-type-tag experience">体验</text> {{stats.byType.experience || 0}}</view>
+        <view class="stat-type"><text class="fb-type-tag other">其他</text> {{stats.byType.other || 0}}</view>
+      </view>
+    </view>
+
+    <!-- 搜索框 -->
+    <view class="admin-search card">
+      <view class="search-input-wrap">
+        <input class="search-input" placeholder="搜索反馈内容…" value="{{keyword}}" bindinput="onKeywordInput" confirm-type="search" bindconfirm="onSearch" />
+        <text wx:if="{{keyword}}" class="search-clear" bindtap="onClearKeyword">✕</text>
+      </view>
+    </view>
+
+    <!-- 类型筛选 -->
+    <scroll-view class="type-scroll" scroll-x enable-flex>
+      <view class="type-chip {{typeFilter === '' ? 'on' : ''}}" data-type="" bindtap="onTypeFilter">全部类型</view>
+      <view class="type-chip {{typeFilter === 'bug' ? 'on' : ''}}" data-type="bug" bindtap="onTypeFilter">Bug 反馈</view>
+      <view class="type-chip {{typeFilter === 'feature' ? 'on' : ''}}" data-type="feature" bindtap="onTypeFilter">功能建议</view>
+      <view class="type-chip {{typeFilter === 'experience' ? 'on' : ''}}" data-type="experience" bindtap="onTypeFilter">体验优化</view>
+      <view class="type-chip {{typeFilter === 'other' ? 'on' : ''}}" data-type="other" bindtap="onTypeFilter">其他</view>
+    </scroll-view>
+
     <!-- Tabs -->
     <view class="admin-tabs">
       <view class="admin-tab {{tab === 'pending' ? 'on' : ''}}" data-tab="pending" bindtap="onTab">待处理</view>
@@ -19,17 +61,42 @@
     </view>
 
     <view wx:for="{{list}}" wx:key="_id" class="card admin-item">
+      <!-- 头部 -->
       <view class="row between">
         <text class="fb-type-tag {{item.type}}">{{item.typeLabel}}</text>
-        <text class="fb-status {{item.status}}">{{item.status === 'resolved' ? '已处理' : '待处理'}}</text>
+        <view class="row" style="gap:12rpx">
+          <text class="fb-status {{item.status}}">{{item.status === 'resolved' ? '已处理' : '待处理'}}</text>
+          <text class="admin-expand {{item._expanded ? 'on' : ''}}" data-id="{{item._id}}" bindtap="onToggleExpand">{{item._expanded ? '收起 ▲' : '展开 ▼'}}</text>
+        </view>
       </view>
+
+      <!-- 内容（始终显示） -->
       <view class="admin-content" data-content="{{item.content}}" bindtap="onCopyContent">{{item.content}}</view>
-      <view class="admin-meta">
-        <text class="muted">用户 {{item.openidMask}}</text>
-        <text class="muted">{{item.timeLabel}}</text>
+
+      <!-- 展开信息 -->
+      <view wx:if="{{item._expanded}}" class="admin-detail">
+        <view class="admin-meta"><text class="muted">用户 {{item.openidMask}}</text></view>
+        <view class="admin-meta"><text class="muted">提交于 {{item.timeLabel}}</text></view>
+        <view wx:if="{{item.contact}}" class="admin-meta row between">
+          <text class="muted">联系方式：{{item.contact}}</text>
+          <text class="link sm" data-contact="{{item.contact}}" bindtap="onCopyContact">复制</text>
+        </view>
+
+        <!-- 管理员回复（如果有） -->
+        <view wx:if="{{item.adminReply}}" class="admin-reply-block">
+          <view class="admin-reply-label">👨‍💼 管理员回复</view>
+          <view class="admin-reply-text">{{item.adminReply}}</view>
+          <view wx:if="{{item.repliedTimeLabel}}" class="muted sm">回复于 {{item.repliedTimeLabel}}</view>
+        </view>
+
+        <!-- 回复输入框 -->
+        <view class="admin-reply-input-wrap">
+          <textarea class="admin-reply-input" placeholder="输入回复（回复后自动标记已处理）" maxlength="500" value="{{item._replyInput}}" data-id="{{item._id}}" bindinput="onReplyInput" />
+          <view class="btn sm" data-id="{{item._id}}" bindtap="onReplySubmit">发送回复</view>
+        </view>
       </view>
-      <view wx:if="{{item.contact}}" class="muted" style="font-size: 24rpx">联系方式：{{item.contact}}</view>
-      <view wx:if="{{item.resolvedTimeLabel}}" class="muted" style="font-size: 24rpx">处理于 {{item.resolvedTimeLabel}}</view>
+
+      <!-- 操作按钮 -->
       <view class="admin-actions">
         <view class="btn plain sm" data-id="{{item._id}}" data-status="{{item.status}}" bindtap="onToggleStatus">
           {{item.status === 'resolved' ? '标记待处理' : '标记已处理'}}
