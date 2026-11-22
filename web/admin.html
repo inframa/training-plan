@@ -127,7 +127,7 @@
       <button class="btn" id="initBtn">连接云开发</button>
       <span class="conn-status" id="connStatus">未连接</span>
     </div>
-    <div style="font-size:12px;color:#9aa3ae;margin-top:8px">
+    <div id="connHint" style="font-size:12px;color:#9aa3ae;margin-top:8px;line-height:1.8">
       首次使用需在云开发控制台开启「匿名登录」和配置「Web 安全域名」
     </div>
   </div>
@@ -224,6 +224,9 @@
     localStorage.setItem('fb_adminKey', adminKey);
     showConnected(false, '连接中…');
     try {
+      if (typeof cloudbase === 'undefined') {
+        throw new Error('cloudbase SDK 未加载，请检查网络');
+      }
       app = cloudbase.init({ env: envId });
       await app.auth().signInAnonymously();
       connected = true;
@@ -231,8 +234,15 @@
       await refreshStats();
       await refresh();
     } catch (e) {
+      console.error('连接失败:', e);
       showConnected(false, '❌ ' + (e.message || '连接失败'));
-      toast('连接失败，请检查环境 ID 和匿名登录配置');
+      document.getElementById('connHint').innerHTML =
+        '<span style="color:#e5484d">诊断：</span>' +
+        (e.message || '未知错误') + '<br>' +
+        '<span style="color:#646a73">请按顺序检查：</span>' +
+        '<br>1) <a href="https://console.cloud.tencent.com/tcb/env/auth" target="_blank">云开发控制台 → 授权管理 → 匿名登录（开关打开）</a>' +
+        '<br>2) <a href="https://console.cloud.tencent.com/tcb/env/auth" target="_blank">Web 安全域名 → 添加 cloud1-d9g45hyic21209d8.cloudbaseapp.com</a>' +
+        '<br>3) 微信开发者工具 → 右键 cloudfunctions/feedback → 上传并部署：云端安装依赖';
     }
   });
 
