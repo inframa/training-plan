@@ -38,11 +38,23 @@ Page({
       });
     });
     this.setData({
-      openid: openid ? (openid.indexOf('local-') === 0 ? '本地临时用户' : openid.slice(0, 12) + '…') : '',
+      openid: openid || '',
+      isLocalUser: openid ? openid.indexOf('local-') === 0 : false,
       trainingDays,
       totalVolume: totalVol.toLocaleString(),
       syncStatus: store.state.pendingDates ? ('待同步 ' + store.state.pendingDates.length + ' 条') : '已同步',
       lastLogin: dateUtil.todayStr()
+    });
+  },
+
+  onCopyOpenid() {
+    if (!this.data.openid || this.data.isLocalUser) {
+      wx.showToast({ title: this.data.isLocalUser ? '本地临时用户无 openid' : '暂无 openid', icon: 'none' });
+      return;
+    }
+    wx.setClipboardData({
+      data: this.data.openid,
+      success: () => wx.showToast({ title: 'openid 已复制', icon: 'none' })
     });
   },
 

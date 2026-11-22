@@ -10,6 +10,26 @@
 }
 .mine-user .muted {
   color: rgba(255, 255, 255, 0.75);
+  font-size: 24rpx;
+}
+.mine-openid-row {
+  display: flex;
+  align-items: center;
+  gap: 16rpx;
+  margin-top: 4rpx;
+}
+.mine-openid-row .muted {
+  flex: 1;
+  font-size: 22rpx;
+  font-family: Menlo, Consolas, monospace;
+}
+.mine-copy-btn {
+  font-size: 22rpx;
+  padding: 4rpx 16rpx;
+  border: 1rpx solid rgba(255, 255, 255, 0.4);
+  border-radius: 999rpx;
+  color: #fff;
+  background: rgba(255, 255, 255, 0.15);
 }
 .mine-avatar {
   width: 96rpx;

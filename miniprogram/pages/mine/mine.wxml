@@ -4,7 +4,11 @@
     <view class="mine-avatar">我</view>
     <view class="mine-user-info">
       <view class="h2">健身爱好者</view>
-      <view class="muted">ID：{{openid}}</view>
+      <view wx:if="{{isLocalUser}}" class="muted">本地临时用户（未登录）</view>
+      <view wx:else class="mine-openid-row">
+        <text class="muted" style="word-break:break-all">openid：{{openid || '加载中…'}}</text>
+        <text class="mine-copy-btn" bindtap="onCopyOpenid">复制</text>
+      </view>
     </view>
   </view>
 
