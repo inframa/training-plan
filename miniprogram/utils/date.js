@@ -64,6 +64,14 @@ function weekDayCN(str) {
   return '日一二三四五六'[parseDate(str).getDay()];
 }
 
+// 时间戳 → yyyy-MM-dd HH:mm
+function formatTime(ts) {
+  if (!ts) return '';
+  const d = new Date(ts);
+  return d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate())
+    + ' ' + pad(d.getHours()) + ':' + pad(d.getMinutes());
+}
+
 module.exports = {
   pad,
   fmtDate,
@@ -73,5 +81,6 @@ module.exports = {
   addDays,
   monthTitle,
   monthGrid,
-  weekDayCN
+  weekDayCN,
+  formatTime
 };
