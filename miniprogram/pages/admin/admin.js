@@ -22,12 +22,12 @@ Page({
   async onLoad() {
     try {
       const r = await api.feedback.checkAdmin();
-      this.setData({ isAdmin: !!r, loading: false });
+      const myOpenid = (r && r.myOpenid) || '';
+      this.setData({ isAdmin: !!(r && r.isAdmin), loading: false, myOpenid });
       if (this.data.isAdmin) {
         this.refresh();
         this.refreshStats();
         this.refreshAdmins();
-        this.fetchMyOpenid();
       }
     } catch (e) {
       this.setData({ isAdmin: false, loading: false });
@@ -178,18 +178,13 @@ Page({
     if (!this.data.isAdmin) return;
     try {
       const r = await api.feedback.listAdmins();
-      this.setData({
+      const patch = {
         admins: r.list || [],
         isDefaultOpen: !!r.isDefaultOpen
-      });
-    } catch (e) { /* 忽略 */ }
-  },
-
-  async fetchMyOpenid() {
-    try {
-      const r = await wx.cloud.callFunction({ name: 'login' });
-      const openid = r.result && r.result.data && r.result.data.openid;
-      this.setData({ myOpenid: openid || '' });
+      };
+      // 顺便拿到当前用户 openid（如果之前没拿到）
+      if (r.myOpenid && !this.data.myOpenid) patch.myOpenid = r.myOpenid;
+      this.setData(patch);
     } catch (e) { /* 忽略 */ }
   },
 

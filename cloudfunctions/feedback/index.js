@@ -179,16 +179,15 @@ async function stats(openid, key) {
 // ==================== 管理员管理 ====================
 
 async function checkAdmin(openid, key) {
-  return { code: 0, message: 'ok', data: { isAdmin: await isAdmin(openid, key), keyConfigured: true } };
+  return { code: 0, message: 'ok', data: { isAdmin: await isAdmin(openid, key), keyConfigured: true, myOpenid: openid || '' } };
 }
 
 async function listAdmins(openid, key) {
   const denied = await requireAdmin(openid, key);
   if (denied) return denied;
   const list = await getAdminOpenids();
-  // 如果集合为空，返回空列表并标记 isDefaultOpen 说明是"默认所有人管理员"状态
   const isDefaultOpen = list.length === 0;
-  return { code: 0, message: 'ok', data: { list, isDefaultOpen } };
+  return { code: 0, message: 'ok', data: { list, isDefaultOpen, myOpenid: openid || '' } };
 }
 
 async function addAdmin(openid, key, targetOpenid, remark) {
