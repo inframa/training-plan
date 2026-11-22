@@ -76,7 +76,7 @@ Page({
     wx.navigateTo({ url: '/pages/feedback/feedback' });
   },
 
-  // 彩蛋：连续点版本号 7 次进入管理后台
+  // 彩蛋：连续点版本号 7 次进入管理后台（无弹窗提示）
   _aboutTaps: 0,
   _aboutTimer: null,
   onAbout() {
@@ -86,12 +86,6 @@ Page({
     if (this._aboutTaps >= 7) {
       this._aboutTaps = 0;
       wx.navigateTo({ url: '/pages/admin/admin' });
-      return;
     }
-    wx.showModal({
-      title: '关于',
-      content: '健身容量记录 v1.0\n本地优先 · 自动同步\n\n训练日历、容量追踪、动作库、训练计划模板',
-      showCancel: false
-    });
   }
 });
