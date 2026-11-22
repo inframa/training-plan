@@ -148,7 +148,7 @@ async function get(openid, event) {
   });
 }
 
-// 当月有记录的日期与训练标题/容量（区分已训练/草稿）
+// 当月有记录的日期与训练标题/容量（区分已训练/未训练）
 async function month(openid, event) {
   const ym = event.yearMonth || '';
   if (!/^\d{4}-\d{2}$/.test(ym)) return err(2001, '参数错误');

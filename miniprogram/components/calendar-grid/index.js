@@ -1,4 +1,4 @@
-// 月历格子：状态区分（今天/选中/有记录/草稿/未来）
+// 月历格子：状态区分（今天/选中/有记录/未训练/未来）
 const { monthGrid, todayStr } = require('../../utils/date');
 
 Component({
