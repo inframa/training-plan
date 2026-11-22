@@ -1,7 +1,11 @@
 <view class="page mine">
   <!-- 用户信息卡 -->
   <view class="card mine-user">
-    <view class="mine-avatar">我</view>
+    <!-- 头像：微信 chooseAvatar 组件（自动内容安全审核） -->
+    <button class="mine-avatar-btn" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+      <image wx:if="{{avatarUrl}}" class="mine-avatar-img" src="{{avatarUrl}}" mode="aspectFill"></image>
+      <view wx:else class="mine-avatar">我</view>
+    </button>
     <view class="mine-user-info">
       <view class="h2">健身爱好者</view>
       <view wx:if="{{isLocalUser}}" class="muted">本地临时用户（未登录）</view>

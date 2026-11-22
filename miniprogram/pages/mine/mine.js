@@ -1,9 +1,12 @@
 const store = require('../../store/store');
 const dateUtil = require('../../utils/date');
 
+const DEFAULT_AVATAR = ''; // 未设置时的默认头像，空则显示文字头像
+
 Page({
   data: {
     openid: '',
+    avatarUrl: '',
     trainingDays: 0,
     totalVolume: '0',
     syncStatus: '',
@@ -24,7 +27,7 @@ Page({
     if (store.isReady()) this.refresh();
   },
 
-  refresh() {
+  async refresh() {
     const openid = store.getOpenid();
     // 累计训练天数：遍历 monthMarks
     const marks = store.state.monthMarks || {};
@@ -37,14 +40,58 @@ Page({
         if (m && m.volume) totalVol += Number(m.volume) || 0;
       });
     });
-    this.setData({
+    const patch = {
       openid: openid || '',
       isLocalUser: openid ? openid.indexOf('local-') === 0 : false,
       trainingDays,
       totalVolume: totalVol.toLocaleString(),
       syncStatus: store.state.pendingDates ? ('待同步 ' + store.state.pendingDates.length + ' 条') : '已同步',
       lastLogin: dateUtil.todayStr()
-    });
+    };
+    // 读取用户头像
+    if (openid && openid.indexOf('local-') !== 0) {
+      try {
+        const db = wx.cloud.database();
+        const res = await db.collection('user').where({ _openid: openid }).limit(1).get();
+        if (res.data && res.data[0] && res.data[0].avatar) {
+          patch.avatarUrl = res.data[0].avatar;
+        }
+      } catch (e) { /* 忽略 */ }
+    }
+    this.setData(patch);
+  },
+
+  async onChooseAvatar(e) {
+    const tempPath = e.detail.avatarUrl;
+    if (!tempPath) return;
+    const openid = this.data.openid;
+    if (!openid || this.data.isLocalUser) {
+      wx.showToast({ title: '请先登录', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '上传中…' });
+    try {
+      // 1) 上传到云存储（头像按 openid 覆盖，固定路径）
+      const cloudPath = 'user-avatars/' + openid + '.jpg';
+      const upRes = await wx.cloud.uploadFile({ cloudPath, filePath: tempPath });
+      const fileID = upRes.fileID;
+      // 2) 通过 login 云函数更新 user 集合（走云函数绕过安全规则）
+      const callRes = await wx.cloud.callFunction({
+        name: 'login',
+        data: { action: 'updateProfile', payload: { avatar: fileID } }
+      });
+      if (!callRes.result || callRes.result.code !== 0) {
+        throw new Error(callRes.result && callRes.result.message || '更新失败');
+      }
+      // 3) 本地刷新
+      this.setData({ avatarUrl: fileID });
+      wx.hideLoading();
+      wx.showToast({ title: '头像已更新', icon: 'success' });
+    } catch (e) {
+      wx.hideLoading();
+      console.error('头像上传失败:', e);
+      wx.showToast({ title: '上传失败: ' + (e.errMsg || e.message || ''), icon: 'none' });
+    }
   },
 
   onCopyOpenid() {

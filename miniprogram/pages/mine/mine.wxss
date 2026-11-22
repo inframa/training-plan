@@ -31,6 +31,30 @@
   color: #fff;
   background: rgba(255, 255, 255, 0.15);
 }
+.mine-avatar-btn {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: transparent;
+  line-height: 1;
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  overflow: hidden;
+  position: relative;
+}
+.mine-avatar-btn::after {
+  border: none;
+}
+.mine-avatar-btn:active {
+  opacity: 0.8;
+}
+.mine-avatar-btn .mine-avatar-img {
+  width: 96rpx;
+  height: 96rpx;
+  border-radius: 50%;
+  display: block;
+}
 .mine-avatar {
   width: 96rpx;
   height: 96rpx;
