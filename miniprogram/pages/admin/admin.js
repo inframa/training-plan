@@ -5,14 +5,18 @@ Page({
   data: {
     isAdmin: false,
     loading: true,
-    tab: 'pending',          // pending / resolved / all
+    tab: 'pending',          // pending / resolved / all / admins
     typeFilter: '',          // '' / bug / feature / experience / other
     keyword: '',             // 搜索关键词
     list: [],
     empty: false,
     stats: null,             // { total, pending, resolved, byType }
     replyInput: {},          // { feedbackId: text }
-    expanded: {}             // 展开详情的 id 集合
+    expanded: {},            // 展开详情的 id 集合
+    // 管理员管理
+    admins: [],              // openid 列表
+    isDefaultOpen: false,    // true = 默认所有人管理员（首次部署）
+    myOpenid: ''             // 当前用户 openid（用于一键添加自己）
   },
 
   async onLoad() {
@@ -22,6 +26,8 @@ Page({
       if (this.data.isAdmin) {
         this.refresh();
         this.refreshStats();
+        this.refreshAdmins();
+        this.fetchMyOpenid();
       }
     } catch (e) {
       this.setData({ isAdmin: false, loading: false });
@@ -29,11 +35,11 @@ Page({
   },
 
   onShow() {
-    if (this.data.isAdmin) { this.refresh(); this.refreshStats(); }
+    if (this.data.isAdmin) { this.refresh(); this.refreshStats(); this.refreshAdmins(); }
   },
 
   onPullDownRefresh() {
-    Promise.all([this.refresh(), this.refreshStats()]).finally(() => wx.stopPullDownRefresh());
+    Promise.all([this.refresh(), this.refreshStats(), this.refreshAdmins()]).finally(() => wx.stopPullDownRefresh());
   },
 
   onTab(e) {
@@ -164,5 +170,94 @@ Page({
   onCopyContact(e) {
     const c = e.currentTarget.dataset.contact;
     if (c) wx.setClipboardData({ data: c });
+  },
+
+  // ============ 管理员管理 ============
+
+  async refreshAdmins() {
+    if (!this.data.isAdmin) return;
+    try {
+      const r = await api.feedback.listAdmins();
+      this.setData({
+        admins: r.list || [],
+        isDefaultOpen: !!r.isDefaultOpen
+      });
+    } catch (e) { /* 忽略 */ }
+  },
+
+  async fetchMyOpenid() {
+    try {
+      const r = await wx.cloud.callFunction({ name: 'login' });
+      const openid = r.result && r.result.data && r.result.data.openid;
+      this.setData({ myOpenid: openid || '' });
+    } catch (e) { /* 忽略 */ }
+  },
+
+  async onAddSelf() {
+    if (!this.data.myOpenid) { wx.showToast({ title: '获取不到 openid', icon: 'none' }); return; }
+    try {
+      await api.feedback.addAdmin(this.data.myOpenid, '我自己');
+      wx.showToast({ title: '已添加自己为管理员', icon: 'success' });
+      this.refreshAdmins();
+    } catch (e) {
+      wx.showToast({ title: e.message || '添加失败', icon: 'none' });
+    }
+  },
+
+  async onAddAdmin() {
+    wx.showModal({
+      title: '添加管理员',
+      editable: true,
+      placeholderText: '粘贴 openid（o 开头）',
+      confirmColor: '#2E6BE6',
+      success: async (res) => {
+        if (!res.confirm) return;
+        const openid = (res.content || '').trim();
+        if (!openid) { wx.showToast({ title: 'openid 不能为空', icon: 'none' }); return; }
+        try {
+          await api.feedback.addAdmin(openid, '');
+          wx.showToast({ title: '添加成功', icon: 'success' });
+          this.refreshAdmins();
+        } catch (e) {
+          wx.showToast({ title: e.message || '添加失败', icon: 'none' });
+        }
+      }
+    });
+  },
+
+  async onRemoveAdmin(e) {
+    const openid = e.currentTarget.dataset.openid;
+    const isSelf = openid === this.data.myOpenid;
+    if (isSelf) {
+      wx.showToast({ title: '不能移除自己', icon: 'none' });
+      return;
+    }
+    wx.showModal({
+      title: '移除管理员',
+      content: openid.slice(0, 6) + '…' + openid.slice(-4),
+      confirmColor: '#E5484D',
+      success: async (res) => {
+        if (!res.confirm) return;
+        try {
+          await api.feedback.removeAdmin(openid);
+          wx.showToast({ title: '已移除', icon: 'success' });
+          this.refreshAdmins();
+        } catch (e) {
+          wx.showToast({ title: e.message || '移除失败', icon: 'none' });
+        }
+      }
+    });
+  },
+
+  onCopyOpenid(e) {
+    const openid = e.currentTarget.dataset.openid;
+    wx.setClipboardData({ data: openid, success: () => wx.showToast({ title: '已复制', icon: 'none' }) });
+  },
+
+  // 切 tab 时只在非 admins 时 refresh 反馈列表
+  onTab(e) {
+    const tab = e.currentTarget.dataset.tab;
+    this.setData({ tab });
+    if (tab !== 'admins') this.refresh();
   }
 });

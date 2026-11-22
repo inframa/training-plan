@@ -33,4 +33,23 @@ function checkAdmin() {
   return callCloud('feedback', { action: 'checkAdmin' });
 }
 
-module.exports = { submit, listMine, listAll, markResolved, reply, del, stats, checkAdmin };
+function listAdmins() {
+  return callCloud('feedback', { action: 'listAdmins' });
+}
+
+function addAdmin(openid, remark) {
+  return callCloud('feedback', { action: 'addAdmin', payload: { openid, remark: remark || '' } });
+}
+
+function removeAdmin(openid) {
+  return callCloud('feedback', { action: 'removeAdmin', payload: { openid } });
+}
+
+function getMyOpenid() {
+  return callCloud('feedback', { action: 'listMine', payload: {} }).then(() => {
+    // 从 login 云函数获取，更可靠
+    return callCloud('login', {});
+  }).then(r => r && r.openid);
+}
+
+module.exports = { submit, listMine, listAll, markResolved, reply, del, stats, checkAdmin, listAdmins, addAdmin, removeAdmin };

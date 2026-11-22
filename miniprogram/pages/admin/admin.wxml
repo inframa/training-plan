@@ -54,8 +54,51 @@
       <view class="admin-tab {{tab === 'pending' ? 'on' : ''}}" data-tab="pending" bindtap="onTab">待处理</view>
       <view class="admin-tab {{tab === 'resolved' ? 'on' : ''}}" data-tab="resolved" bindtap="onTab">已处理</view>
       <view class="admin-tab {{tab === 'all' ? 'on' : ''}}" data-tab="all" bindtap="onTab">全部</view>
+      <view class="admin-tab {{tab === 'admins' ? 'on' : ''}}" data-tab="admins" bindtap="onTab">管理员</view>
     </view>
 
+    <!-- ============ 管理员管理 tab ============ -->
+    <block wx:if="{{tab === 'admins'}}">
+      <!-- 状态提示 -->
+      <view class="card admin-item">
+        <view wx:if="{{isDefaultOpen}}" style="background:#FEF0E1;padding:20rpx 24rpx;border-radius:12rpx;color:#E6912E;font-size:26rpx">
+          ⚠️ 当前为「默认开放」模式——任意用户都能进管理台。请尽快添加至少 1 名管理员关闭白名单。
+        </view>
+        <view wx:else style="background:#E6F6EC;padding:20rpx 24rpx;border-radius:12rpx;color:#2BA471;font-size:26rpx">
+          ✅ 白名单模式已开启（{{admins.length}} 名管理员）
+        </view>
+
+        <!-- 一键添加自己 -->
+        <view class="admin-meta" style="margin-top:24rpx">
+          <text class="muted">我的 openid：{{myOpenid || '获取中…'}}</text>
+        </view>
+        <view class="admin-actions">
+          <view class="btn sm" bindtap="onAddSelf" style="background:#2BA471">➕ 一键添加自己</view>
+          <view class="btn plain sm" bindtap="onAddAdmin">➕ 添加管理员</view>
+        </view>
+      </view>
+
+      <!-- 管理员列表 -->
+      <view wx:if="{{admins.length === 0 && !isDefaultOpen}}" class="card empty" style="padding:60rpx 0">
+        <view class="muted">暂无管理员</view>
+      </view>
+
+      <view wx:for="{{admins}}" wx:key="*this" wx:for-item="adm" class="card admin-item">
+        <view class="row between">
+          <view>
+            <view style="font-size:28rpx;color:#1F2329;font-weight:500">{{adm.openid}}</view>
+            <view wx:if="{{adm.remark}}" class="muted sm" style="margin-top:4rpx">备注：{{adm.remark}}</view>
+          </view>
+          <view class="row" style="gap:12rpx">
+            <text class="link sm" data-openid="{{adm.openid}}" bindtap="onCopyOpenid">复制</text>
+            <view class="btn danger sm" data-openid="{{adm.openid}}" bindtap="onRemoveAdmin">移除</view>
+          </view>
+        </view>
+      </view>
+    </block>
+
+    <!-- ============ 反馈列表 tab ============ -->
+    <block wx:if="{{tab !== 'admins'}}">
     <view wx:if="{{empty}}" class="card empty" style="padding: 80rpx 0">
       <view class="muted">当前分类下暂无反馈</view>
     </view>
@@ -104,5 +147,6 @@
         <view class="btn danger sm" data-id="{{item._id}}" bindtap="onDelete">删除</view>
       </view>
     </view>
+    </block>
   </block>
 </view>

@@ -162,10 +162,25 @@
     <div class="tab active" data-tab="all">全部 <span class="cnt" id="cntAll"></span></div>
     <div class="tab" data-tab="pending">待处理 <span class="cnt" id="cntPending"></span></div>
     <div class="tab" data-tab="resolved">已处理 <span class="cnt" id="cntResolved"></span></div>
+    <div class="tab" data-tab="admins">👨‍💼 管理员</div>
   </div>
 
-  <!-- 列表 -->
+  <!-- 反馈列表 -->
   <div id="listArea"></div>
+
+  <!-- 管理员管理面板 -->
+  <div id="adminArea" style="display:none">
+    <div id="adminStatusBox" style="background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.04);margin-bottom:16px"></div>
+    <div style="background:#fff;border-radius:12px;padding:16px 20px;box-shadow:0 2px 8px rgba(0,0,0,0.04)">
+      <div style="font-weight:600;margin-bottom:12px;font-size:15px">添加管理员</div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <input id="addOpenidInput" placeholder="粘贴 openid（o 开头）" style="flex:1;padding:8px 12px;border:1px solid #e5e6eb;border-radius:8px;font-size:13px" />
+        <input id="addRemarkInput" placeholder="备注（可选）" style="width:140px;padding:8px 12px;border:1px solid #e5e6eb;border-radius:8px;font-size:13px" />
+        <button class="btn" id="addAdminBtn">添加</button>
+      </div>
+    </div>
+    <div id="adminsList" style="margin-top:16px"></div>
+  </div>
 
   <div class="footer-tip">💡 点击反馈内容可复制 · 管理密钥存储在浏览器 localStorage</div>
 </div>
@@ -385,8 +400,90 @@
     document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
     t.classList.add('active');
     currentTab = t.dataset.tab;
-    refresh();
+    if (currentTab === 'admins') {
+      document.getElementById('listArea').style.display = 'none';
+      document.getElementById('toolbar').style.display = 'none';
+      document.getElementById('typeFilters').style.display = 'none';
+      document.getElementById('adminArea').style.display = '';
+      refreshAdmins();
+    } else {
+      document.getElementById('listArea').style.display = '';
+      document.getElementById('toolbar').style.display = '';
+      document.getElementById('typeFilters').style.display = '';
+      document.getElementById('adminArea').style.display = 'none';
+      refresh();
+    }
   }));
+
+  // === 管理员管理 ===
+  let adminsList = [], adminsDefaultOpen = false;
+
+  async function refreshAdmins() {
+    if (!connected) return;
+    try {
+      const r = await callFB('listAdmins');
+      adminsList = r.list || [];
+      adminsDefaultOpen = !!r.isDefaultOpen;
+      renderAdminStatus();
+      renderAdminsList();
+    } catch (e) { toast('加载管理员列表失败：' + e.message); }
+  }
+
+  function renderAdminStatus() {
+    const box = document.getElementById('adminStatusBox');
+    if (adminsDefaultOpen) {
+      box.innerHTML = '<div style="background:#FEF0E1;padding:12px 16px;border-radius:8px;color:#E6912E;font-size:13px">⚠️ 当前为「默认开放」模式——任意用户都能进管理台。请尽快添加至少 1 名管理员关闭白名单。</div>';
+    } else {
+      box.innerHTML = '<div style="background:#E6F6EC;padding:12px 16px;border-radius:8px;color:#2BA471;font-size:13px">✅ 白名单模式已开启（当前 ' + adminsList.length + ' 名管理员）</div>';
+    }
+  }
+
+  function renderAdminsList() {
+    const el = document.getElementById('adminsList');
+    if (!adminsList.length) {
+      el.innerHTML = '<div style="color:#9aa3ae;font-size:13px;text-align:center;padding:30px 0">暂无管理员</div>';
+      return;
+    }
+    el.innerHTML = adminsList.map(a => `
+      <div style="background:#fff;border-radius:10px;padding:14px 18px;box-shadow:0 1px 4px rgba(0,0,0,0.03);margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+        <div>
+          <div style="font-size:14px;font-weight:500;color:#1f2329">${esc(a.openid)}</div>
+          ${a.remark ? '<div style="color:#9aa3ae;font-size:12px;margin-top:3px">备注：' + esc(a.remark) + '</div>' : ''}
+        </div>
+        <div style="display:flex;gap:10px;align-items:center">
+          <a style="color:#646a73;font-size:12px;cursor:pointer" data-copy="${esc(a.openid)}" class="copy-btn">复制</a>
+          <button class="btn danger sm" data-openid="${esc(a.openid)}">移除</button>
+        </div>
+      </div>
+    `).join('');
+    // 绑定事件
+    el.querySelectorAll('.copy-btn').forEach(b => b.addEventListener('click', () => {
+      navigator.clipboard.writeText(b.dataset.copy);
+      toast('已复制');
+    }));
+    el.querySelectorAll('button.danger').forEach(b => b.addEventListener('click', async () => {
+      const openid = b.dataset.openid;
+      if (!confirm('确定移除该管理员？')) return;
+      try {
+        await callFB('removeAdmin', { openid });
+        toast('已移除');
+        refreshAdmins();
+      } catch (e) { toast('移除失败：' + e.message); }
+    }));
+  }
+
+  document.getElementById('addAdminBtn').addEventListener('click', async () => {
+    const openid = document.getElementById('addOpenidInput').value.trim();
+    const remark = document.getElementById('addRemarkInput').value.trim();
+    if (!openid) { toast('请输入 openid'); return; }
+    try {
+      await callFB('addAdmin', { openid, remark });
+      toast('添加成功');
+      document.getElementById('addOpenidInput').value = '';
+      document.getElementById('addRemarkInput').value = '';
+      refreshAdmins();
+    } catch (e) { toast('添加失败：' + e.message); }
+  });
 
   // === Type filters ===
   document.querySelectorAll('#typeFilters span').forEach(s => s.addEventListener('click', () => {
