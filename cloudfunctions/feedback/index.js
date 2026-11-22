@@ -8,7 +8,7 @@ cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 const _ = db.command;
 
-const ADMIN_KEY = 'change-me-please-2026';
+const ADMIN_KEY = 'ivXQwWZwOUgu2KGvYUeEoVhpyAVX/twtZ2LpYzvHgg4=';
 
 // ---- 管理员 openid 缓存（60s TTL）----
 let ADMIN_CACHE = null;
