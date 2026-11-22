@@ -36,7 +36,7 @@
 - **用户端**：`pages/feedback` 提交反馈（bug / feature / experience / other），查看历史记录与管理员回复
 - **Web 管理台**：[web/admin.html](web/admin.html)（单文件，匿名登录 + ADMIN_KEY 鉴权）
 - **小程序彩蛋**：关于页连续点击版本号 v1.0 七次进入管理员页面
-- **云函数**：`feedback`，8 个 action 覆盖 submit / list / listAll / reply / markResolved / delete / stats / checkAdmin
+- **云函数**：`feedback`，11 个 action（含管理员增删）：submit / list / listAll / reply / markResolved / delete / stats / checkAdmin / listAdmins / addAdmin / removeAdmin
 - **自动联动**：管理员回复 → 自动标记已处理；标记已处理无回复 → 自动补默认回复
 
 ### 容量计算引擎
@@ -108,7 +108,7 @@ training-plan/
 │   ├── login/                   # 换取 openid，维护 user 表
 │   ├── action/                  # 动作库 list/detail/create/update/copy/archive/delete
 │   ├── record/                  # 训练记录 save/get/month/lastAction/delete
-│   ├── feedback/                # 反馈通道 submit/list/listAll/reply/markResolved/delete/stats/checkAdmin
+│   ├── feedback/                # 反馈通道（11 个 action + admins 集合鉴权）
 │   └── init/                    # 创建业务集合（部署后执行一次）
 │
 ├── web/
@@ -136,6 +136,7 @@ training-plan/
 | `dayAction` | 每日动作 | `_openid`, `dailyRecordId`, `actionSnapshot{}`, `seatLevel`, `sets[]` |
 | `setRecord` | 训练组 | `_openid`, `dayActionId`, `weight`, `reps`, `done`, `calcAi` |
 | `feedback` | 用户反馈 | `_openid`, `submitter`, `type`, `content`, `contact`, `status`(pending/resolved), `createdAt`, `resolvedAt`, `adminReply`, `repliedAt` |
+| `admins` | 管理员 openid 白名单 | `openid`, `remark`, `addedBy`, `addedAt`（**为空时默认所有人都是管理员**） |
 
 ### 建议索引
 - `dailyRecord`：`_openid + date` 联合唯一索引
@@ -180,34 +181,39 @@ wx.cloud.init({ env: 'your-env-id' });
 
 **4. 初始化数据库**
 
-云开发控制台 → 云函数 → `init` → **测试**，自动创建 6 个集合。
+云开发控制台 → 云函数 → `init` → **测试**，自动创建 7 个集合（新增 `feedback` 和 `admins`）。
 
 **5. 配置反馈管理员（可选）**
 
-编辑 `cloudfunctions/feedback/index.js`：
+编辑 `cloudfunctions/feedback/index.js` 中的 ADMIN_KEY（Web 端 + 小程序彩蛋通用密钥）：
 
 ```js
-const ADMIN_OPENIDS = ['oXXXXXXXXXXXXXXXXXXXXXXXXXXXX']; // 小程序端：填入管理员 openid
-const ADMIN_KEY = 'change-me-please-2026';               // Web 端 + 小程序彩蛋通用密钥
+const ADMIN_KEY = 'change-me-please-2026';   // 改成你自己的强密钥
 ```
 
-修改后重新部署 `feedback` 云函数。
-
-**6. 编译运行**
-
-真机预览时注意在 app.json / 隐私协议中声明相册与相机用途。
+**首次部署默认所有人都是管理员**（`admins` 集合为空时自动开放）。建议首次登录后尽快通过管理台（密钥登录）把核心管理员加入 `admins` 集合，之后变成白名单模式。
 
 ---
 
 ## 🔑 管理员鉴权
 
-反馈通道采用**双轨鉴权**：
+### 三级鉴权逻辑
 
-| 入口 | 鉴权方式 | 配置位置 |
-|------|----------|----------|
-| 小程序彩蛋页（`pages/admin`） | openid 白名单 + ADMIN_KEY | `feedback/index.js` → `ADMIN_OPENIDS` |
-| Web 管理台（`web/admin.html`） | ADMIN_KEY | 同上 → `ADMIN_KEY` |
-| 小程序反馈提交 | 无需登录（submit） | — |
+```
+1) key === ADMIN_KEY          → 直接通过（Web 端 + 彩蛋入口通用，始终有效）
+2) openid ∈ admins 集合       → 通过（小程序彩蛋页长期鉴权）
+3) admins 集合为空 / 不存在  → 默认所有人都是管理员（首次部署场景）
+```
+
+### 如何添加 / 删除管理员
+
+| 方式 | 操作 |
+|------|------|
+| **Web 管理台** | 登录后用 `addAdmin` / `removeAdmin` action |
+| **云开发控制台** | 直接在 `admins` 集合增删记录（字段：`openid`, `remark`） |
+| **小程序彩蛋页** | 用 ADMIN_KEY 登录后调用 addAdmin / removeAdmin |
+
+> ⚠️ `admins` 集合有 60 秒内存缓存。增删后立即生效（代码主动清缓存），但最多等 60 秒。
 
 ### 彩蛋触发
 关于页连续点击版本号 **v1.0 七次** → 弹出密钥输入 → 正确后进入 `pages/admin`。
@@ -215,7 +221,7 @@ const ADMIN_KEY = 'change-me-please-2026';               // Web 端 + 小程序�
 ### Web 管理台使用
 1. 将 `web/admin.html` 部署到云开发静态托管（或本地直接打开）
 2. 输入 ADMIN_KEY 登录
-3. 功能：统计面板、列表搜索（300ms 防抖）、类型筛选、展开详情、回复、标记已处理、删除
+3. 功能：统计面板、列表搜索（300ms 防抖）、类型筛选、展开详情、回复、标记已处理、删除、管理员增删
 
 ---
 
@@ -255,7 +261,7 @@ const ADMIN_KEY = 'change-me-please-2026';               // Web 端 + 小程序�
 
 ---
 
-## 📋 云函数 feedback — 8 个 Action
+## 📋 云函数 feedback — 11 个 Action
 
 | Action | 权限 | 说明 |
 |--------|------|------|
@@ -267,6 +273,9 @@ const ADMIN_KEY = 'change-me-please-2026';               // Web 端 + 小程序�
 | `delete` | 管理员 | 删除反馈 |
 | `stats` | 管理员 | 统计面板数据（总数 / 待处理 / 已处理 / 按类型分布） |
 | `checkAdmin` | 任何人 | 检查当前身份是否管理员 |
+| `listAdmins` | 管理员 | 列出当前 admins 集合 + 是否"默认开放"状态 |
+| `addAdmin` | 管理员 | 新增管理员（openid + 备注） |
+| `removeAdmin` | 管理员 | 移除管理员 |
 
 ---
 

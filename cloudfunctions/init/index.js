@@ -3,7 +3,11 @@ const cloud = require('wx-server-sdk');
 cloud.init({ env: cloud.DYNAMIC_CURRENT_ENV });
 const db = cloud.database();
 
-const COLLECTIONS = ['user', 'action', 'dailyRecord', 'dayAction', 'setRecord'];
+const COLLECTIONS = [
+  'user', 'action', 'dailyRecord', 'dayAction', 'setRecord',
+  'feedback',  // 用户反馈
+  'admins'     // 管理员 openid 白名单（为空时默认所有人都是管理员）
+];
 
 exports.main = async () => {
   const results = {};
