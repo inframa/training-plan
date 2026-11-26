@@ -11,7 +11,8 @@ Page({
     today: '',
     selected: '',
     marks: {},
-    monthMeta: { trained: 0, untrained: 0 }
+    monthMeta: { trained: 0, untrained: 0 },
+    showConsent: false  // 协议同意弹窗
   },
   unsub: null,
 
@@ -27,6 +28,10 @@ Page({
     store.ready().then(() => {
       this.refreshMarks();
       this.fetchMonth();
+      // 检查是否需要展示协议同意弹窗
+      if (!store.hasAgreedConsent()) {
+        this.setData({ showConsent: true });
+      }
     });
   },
 
@@ -102,5 +107,42 @@ Page({
 
   onFutureTap() {
     wx.showToast({ title: '未来日期暂不支持录入', icon: 'none' });
+  },
+
+  // ---------- 协议同意 ----------
+  onAgreeConsent() {
+    store.markAgreedConsent();
+    this.setData({ showConsent: false });
+    // 同意后重新走云登录流程，获取正式 openid
+    wx.showLoading({ title: '登录中…' });
+    store.ready().then(async () => {
+      try {
+        await store.init(); // init 有缓存，不会重复执行
+      } catch (e) { /* ignore */ }
+      wx.hideLoading();
+      wx.showToast({ title: '欢迎使用！', icon: 'success' });
+    });
+  },
+
+  onDisagreeConsent() {
+    wx.showModal({
+      title: '暂不同意',
+      content: '不同意协议将无法使用云同步、头像上传等功能，仅可本地使用训练记录。确定继续？',
+      confirmText: '继续本地使用',
+      cancelText: '再看看',
+      success: (res) => {
+        if (res.confirm) {
+          this.setData({ showConsent: false });
+        }
+      }
+    });
+  },
+
+  onViewTerms() {
+    wx.navigateTo({ url: '/pages/terms/terms' });
+  },
+
+  onViewPrivacy() {
+    wx.navigateTo({ url: '/pages/privacy/privacy' });
   }
 });

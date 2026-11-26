@@ -66,6 +66,22 @@
     </view>
   </view>
 
+  <!-- 协议固定入口（审核要求） -->
+  <view class="card">
+    <view class="mine-row row between" bindtap="onViewTerms">
+      <text>用户服务协议</text>
+      <text class="muted">›</text>
+    </view>
+    <view class="mine-row row between" bindtap="onViewPrivacy">
+      <text>隐私政策</text>
+      <text class="muted">›</text>
+    </view>
+    <view class="mine-row row between" bindtap="onReshowConsent">
+      <text>协议同意状态</text>
+      <text class="mine-sync {{consentAgreed ? 'ok' : 'pending'}}">{{consentAgreed ? '已同意' : '未同意'}}</text>
+    </view>
+  </view>
+
   <view class="card">
     <view class="mine-row row between" bindtap="onAbout">
       <text>关于</text>

@@ -1,0 +1,88 @@
+<view class="privacy">
+  <view class="section">
+    <view class="title">健身容量记录 小程序隐私政策</view>
+    <view class="update-date">更新日期：2026 年 11 月 26 日</view>
+  </view>
+
+  <view class="section">
+    <view class="p">"健身容量记录"小程序（以下简称"本小程序"）深知个人信息对您的重要性，我们将按照法律法规要求，采取相应安全保护措施，尽力保护您的个人信息安全可控。本隐私政策旨在帮助您了解我们如何收集、使用、存储和保护您的个人信息。</view>
+    <view class="p">请您在使用本小程序前仔细阅读本政策，一旦您开始使用本小程序，即表示您已同意本政策的全部内容。</view>
+  </view>
+
+  <view class="section">
+    <view class="h1">一、我们收集的信息</view>
+    <view class="p">本小程序仅收集实现核心功能所必需的最少信息：</view>
+
+    <view class="sub">1. 微信身份标识（openid）</view>
+    <view class="p">当您首次启动本小程序时，我们通过微信云开发自动获取您的 openid。openid 是微信提供的用户身份标识符，无法用于反查您的真实身份、手机号或微信号。</view>
+
+    <view class="sub">2. 用户自主提供的信息</view>
+    <view class="list">
+      <view class="item">• 头像：您可通过微信头像选择功能上传自定义头像，该功能由微信提供并自动进行内容安全审核</view>
+      <view class="item">• 反馈内容：您在"意见反馈"页面主动提交的文字内容</view>
+    </view>
+
+    <view class="sub">3. 您使用过程中产生的信息</view>
+    <view class="list">
+      <view class="item">• 训练记录：您录入的训练日期、训练动作、重量、次数、训练容量等数据</view>
+      <view class="item">• 动作库：您创建或编辑的训练动作信息</view>
+      <view class="item">• 同步日志：数据同步时间和状态</view>
+    </view>
+
+    <view class="sub">4. 我们不会收集以下信息</view>
+    <view class="list">
+      <view class="item">• 您的真实姓名、身份证号、手机号、微信号</view>
+      <view class="item">• 您的地理位置信息</view>
+      <view class="item">• 您的通讯录、相册内容</view>
+      <view class="item">• 您的设备标识、IMEI 等硬件信息</view>
+      <view class="item">• 剪切板内容（我们仅在您点击"复制"按钮时向剪切板写入内容，不会主动读取您的剪切板）</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="h1">二、我们如何使用收集的信息</view>
+    <view class="p">我们收集的信息仅用于以下目的：</view>
+    <view class="list">
+      <view class="item">1. 提供核心服务：为您存储和管理训练记录、动作库、训练计划等数据</view>
+      <view class="item">2. 数据同步：在您的设备和云服务器之间同步训练数据，确保数据安全不丢失</view>
+      <view class="item">3. 身份识别：通过 openid 区分不同用户的训练数据，确保数据隔离</view>
+      <view class="item">4. 意见反馈：接收和处理您提交的反馈建议</view>
+      <view class="item">5. 头像展示：展示您选择的自定义头像</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="h1">三、信息的存储与保护</view>
+    <view class="list">
+      <view class="item">• 您的训练数据存储在腾讯云 CloudBase 云开发服务中，采用行业标准的数据加密传输和存储</view>
+      <view class="item">• 云数据库默认配置为"仅创建者可读写"，您的数据仅您本人可访问</view>
+      <view class="item">• 您的头像存储在腾讯云云存储中，同样遵循"仅创建者可读写"的访问控制</view>
+      <view class="item">• 我们不会将您的任何个人信息出售、出租或以其他方式提供给第三方（法律法规要求的除外）</view>
+      <view class="item">• 本小程序可能包含指向微信云开发服务的链接（如静态托管页面），第三方将有自己的隐私政策</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="h1">四、信息的删除与撤回</view>
+    <view class="list">
+      <view class="item">• 您可以随时删除本地训练记录和云端训练记录</view>
+      <view class="item">• 您可以通过"清除本地缓存"功能清除本设备上的所有本地数据</view>
+      <view class="item">• 如需删除您的全部云端数据，请通过"意见反馈"功能联系我们，我们将在合理时间内处理您的请求</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="h1">五、未成年人保护</view>
+    <view class="p">本小程序不面向未满 14 周岁的未成年人。若您是未满 14 周岁的未成年人，请在监护人的陪同下阅读本政策，并在取得监护人同意后使用本小程序。</view>
+  </view>
+
+  <view class="section">
+    <view class="h1">六、政策的更新</view>
+    <view class="p">本隐私政策可能会不时更新。更新后的政策将在本小程序内公告，重大变更将通过弹窗提示您。继续使用本小程序即视为您接受更新后的政策。</view>
+  </view>
+
+  <view class="section">
+    <view class="h1">七、联系方式</view>
+    <view class="p">如您对本隐私政策有任何疑问、意见或建议，请通过本小程序内的"意见反馈"功能与我们联系，我们将尽快回复。</view>
+  </view>
+</view>

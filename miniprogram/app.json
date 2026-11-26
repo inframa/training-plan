@@ -8,7 +8,9 @@
     "pages/actionEdit/actionEdit",
     "pages/actionDetail/actionDetail",
     "pages/feedback/feedback",
-    "pages/admin/admin"
+    "pages/admin/admin",
+    "pages/terms/terms",
+    "pages/privacy/privacy"
   ],
   "window": {
     "backgroundColor": "#F5F6FA",

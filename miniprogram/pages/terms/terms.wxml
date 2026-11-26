@@ -1,0 +1,65 @@
+<view class="terms">
+  <view class="section">
+    <view class="title">健身容量记录 小程序用户服务协议</view>
+    <view class="update-date">更新日期：2026 年 11 月 26 日</view>
+  </view>
+
+  <view class="section">
+    <view class="h1">一、协议的接受与修改</view>
+    <view class="p">欢迎使用"健身容量记录"小程序（以下简称"本小程序"）。在使用本小程序前，请您仔细阅读本协议的全部内容。您开始使用本小程序，即视为您已阅读并同意本协议的全部条款。</view>
+    <view class="p">本小程序的开发者有权根据业务发展需要对本协议进行修改，修改后的协议将在本小程序内公告。继续使用本小程序即视为您接受修改后的协议。</view>
+  </view>
+
+  <view class="section">
+    <view class="h1">二、服务内容</view>
+    <view class="p">本小程序为您提供以下服务：</view>
+    <view class="list">
+      <view class="item">1. 训练日历：记录每日训练状态与训练容量</view>
+      <view class="item">2. 动作库：浏览、搜索、管理训练动作</view>
+      <view class="item">3. 训练计划模板：创建和管理训练计划</view>
+      <view class="item">4. 数据统计：查看训练天数和累计容量</view>
+      <view class="item">5. 意见反馈：向开发者提交反馈建议</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="h1">三、用户行为规范</view>
+    <view class="p">您承诺在使用本小程序过程中遵守以下规范：</view>
+    <view class="list">
+      <view class="item">1. 不得利用本小程序从事任何违反法律法规的活动</view>
+      <view class="item">2. 不得上传或传播违法、违规、淫秽、暴力等不良内容</view>
+      <view class="item">3. 不得恶意攻击、干扰本小程序的正常运行</view>
+      <view class="item">4. 不得擅自反编译、反汇编或破解本小程序</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="h1">四、知识产权</view>
+    <view class="p">本小程序的代码、界面、设计、文字、图片等所有内容，其知识产权均归本小程序开发者所有。未经书面授权，任何单位或个人不得以任何形式复制、传播、展示、修改或用于商业目的。</view>
+  </view>
+
+  <view class="section">
+    <view class="h1">五、免责声明</view>
+    <view class="list">
+      <view class="item">1. 本小程序提供的训练记录功能仅供参考，不构成任何医疗建议或指导</view>
+      <view class="item">2. 因网络、设备故障或不可抗力导致的数据丢失，本小程序不承担责任</view>
+      <view class="item">3. 您因使用本小程序产生的训练损伤或其他人身伤害，本小程序不承担责任</view>
+      <view class="item">4. 本小程序可能包含指向第三方网站或服务的链接，这些第三方内容不在本小程序控制范围内</view>
+    </view>
+  </view>
+
+  <view class="section">
+    <view class="h1">六、服务的变更与终止</view>
+    <view class="p">本小程序开发者有权根据业务需要变更、暂停或终止部分或全部服务，并将提前或在合理时间内通知您。</view>
+  </view>
+
+  <view class="section">
+    <view class="h1">七、适用法律与争议解决</view>
+    <view class="p">本协议的订立、执行和解释及争议的解决均应适用中华人民共和国法律。如双方就本协议内容或其执行发生任何争议，双方应尽量友好协商解决；协商不成时，任何一方均可向本小程序开发者所在地有管辖权的人民法院提起诉讼。</view>
+  </view>
+
+  <view class="section">
+    <view class="h1">八、联系方式</view>
+    <view class="p">如您对本协议有任何疑问或建议，可通过本小程序内的"意见反馈"功能与我们联系。</view>
+  </view>
+</view>

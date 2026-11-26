@@ -69,17 +69,37 @@ function migrateIfNeeded(newOpenid) {
   wx.setStorageSync('last_openid', newOpenid);
 }
 
+// ---------- 协议同意门（consent gate）----------
+const CONSENT_KEY = 'consent_agreed';
+const CONSENT_VERSION = 1;
+
+function hasAgreedConsent() {
+  const v = wx.getStorageSync(CONSENT_KEY);
+  return v && v.version === CONSENT_VERSION;
+}
+
+function markAgreedConsent() {
+  wx.setStorageSync(CONSENT_KEY, { version: CONSENT_VERSION, at: Date.now() });
+}
+
 // ---------- 初始化 ----------
 async function init() {
   if (state.readyPromise) return state.readyPromise;
   state.today = todayStr();
   state.readyPromise = (async () => {
-    try {
-      const res = await api.login();
-      state.openid = res.openid;
-      migrateIfNeeded(res.openid);
-    } catch (e) {
-      // 离线兜底：使用本地临时 ID
+    // 协议同意门：未同意则跳过云登录，仅用本地临时 ID
+    if (hasAgreedConsent()) {
+      try {
+        const res = await api.login();
+        state.openid = res.openid;
+        migrateIfNeeded(res.openid);
+      } catch (e) {
+        // 离线兜底：使用本地临时 ID
+        state.openid = wx.getStorageSync('local_openid') || 'local-' + Date.now();
+        wx.setStorageSync('local_openid', state.openid);
+      }
+    } else {
+      // 未同意：仅使用本地临时 ID，不采集任何身份信息
       state.openid = wx.getStorageSync('local_openid') || 'local-' + Date.now();
       wx.setStorageSync('local_openid', state.openid);
     }
@@ -400,6 +420,9 @@ module.exports = {
   subscribe,
   getOpenid: () => state.openid,
   isReady: () => state.ready,
+  // 协议同意门
+  hasAgreedConsent,
+  markAgreedConsent,
   // 动作库
   getLibrary,
   findAction,

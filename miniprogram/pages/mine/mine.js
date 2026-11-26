@@ -10,7 +10,8 @@ Page({
     trainingDays: 0,
     totalVolume: '0',
     syncStatus: '',
-    lastLogin: ''
+    lastLogin: '',
+    consentAgreed: false  // 协议同意状态
   },
   unsub: null,
 
@@ -46,7 +47,8 @@ Page({
       trainingDays,
       totalVolume: totalVol.toLocaleString(),
       syncStatus: store.state.pendingDates ? ('待同步 ' + store.state.pendingDates.length + ' 条') : '已同步',
-      lastLogin: dateUtil.todayStr()
+      lastLogin: dateUtil.todayStr(),
+      consentAgreed: store.hasAgreedConsent()
     };
     // 读取用户头像
     if (openid && openid.indexOf('local-') !== 0) {
@@ -145,6 +147,26 @@ Page({
     if (this._aboutTaps >= 7) {
       this._aboutTaps = 0;
       wx.navigateTo({ url: '/pages/admin/admin' });
+    }
+  },
+
+  // ---------- 协议入口 ----------
+  onViewTerms() {
+    wx.navigateTo({ url: '/pages/terms/terms' });
+  },
+
+  onViewPrivacy() {
+    wx.navigateTo({ url: '/pages/privacy/privacy' });
+  },
+
+  onReshowConsent() {
+    if (this.data.consentAgreed) {
+      wx.showModal({
+        title: '已同意协议',
+        content: '您已同意过协议。如需重新同意或撤回，请清除本地缓存后重新启动小程序。',
+        showCancel: false,
+        confirmText: '知道了'
+      });
     }
   }
 });
