@@ -38,10 +38,11 @@
         <text class="consent-sep"> 和 </text>
         <text class="consent-link" bindtap="onViewPrivacy">《隐私政策》</text>
       </view>
-      <view class="consent-desc consent-desc-detail">同意后，我们将获取您的微信身份标识（openid）用于数据存储与同步，不会收集其他敏感信息。</view>
+      <view class="consent-desc consent-desc-detail">同意后，自动注册账号，获取微信身份标识（openid）用于云端数据存储与同步，不会收集其他敏感信息。</view>
+      <view class="consent-desc consent-desc-detail">不同意可继续使用，但数据仅保存在本机，不云端同步，清理缓存会丢失。</view>
       <view class="consent-btns">
-        <button class="consent-btn-primary" bindtap="onAgreeConsent">我已阅读并同意</button>
-        <button class="consent-btn-secondary" bindtap="onDisagreeConsent">不同意并退出</button>
+        <button class="consent-btn-primary" bindtap="onAgreeConsent">同意并注册</button>
+        <button class="consent-btn-secondary" bindtap="onDisagreeConsent">不同意，继续本地使用</button>
       </view>
     </view>
   </view>

@@ -26,17 +26,16 @@ Page({
     });
     this.unsub = store.subscribe(() => this.refreshMarks());
 
-    // 第一优先级：未同意协议 → 直接弹，不经过 store（最可靠，不依赖 promise 链路）
-    if (!store.hasAgreedConsent()) {
-      this.setData({ showConsent: true });
-      return;
-    }
-
-    // 已同意 → 正常初始化
+    // store.init() 不管同意与否都会成功（同意=正式用户, 不同意=临时账户）
     store.ready().then(() => {
       this.refreshMarks();
       this.fetchMonth();
     });
+
+    // 未同意协议 → 弹提示窗，告知临时账户模式（用户可随时回来同意注册）
+    if (!store.hasAgreedConsent()) {
+      this.setData({ showConsent: true });
+    }
   },
 
   onUnload() {
@@ -57,8 +56,9 @@ Page({
     this.setData({ marks, monthMeta: { trained, untrained } });
   },
 
-  // 拉取云端当月数据合并
+  // 拉取云端当月数据合并（临时账户跳过）
   async fetchMonth() {
+    if (store.isTempUser()) return; // 临时账户不读云端
     const { year, month } = this.data;
     const ym = year + '-' + dateUtil.pad(month);
     try {
@@ -138,18 +138,9 @@ Page({
   },
 
   onDisagreeConsent() {
-    wx.showModal({
-      title: '退出小程序',
-      content: '不同意协议将无法使用本小程序。您可以查看协议内容后再做决定，或直接退出。',
-      confirmText: '退出小程序',
-      cancelText: '再看看',
-      success: (res) => {
-        if (res.confirm) {
-          // 用户确认退出
-          wx.exitMiniProgram({ fail: () => { /* 兜底 */ } });
-        }
-      }
-    });
+    // 临时账户模式：关闭弹窗，允许继续使用（仅本地存储）
+    this.setData({ showConsent: false });
+    wx.showToast({ title: '当前为临时账户，数据仅存本地', icon: 'none', duration: 2000 });
   },
 
   onViewTerms() {

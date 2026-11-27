@@ -55,7 +55,8 @@ function setPrefix(openid) {
 // 首次离线使用临时 ID，登录成功后迁移本地数据
 function migrateIfNeeded(newOpenid) {
   const last = wx.getStorageSync('last_openid');
-  if (last && last !== newOpenid && last.indexOf('local-') === 0) {
+  const isOldTemp = last && (last.indexOf('local-') === 0 || last === TEMP_OPENID);
+  if (isOldTemp && last !== newOpenid) {
     const oldPrefix = 'u_' + last + '_';
     const newPrefix = 'u_' + newOpenid + '_';
     storage.allKeys().forEach((key) => {
@@ -72,6 +73,7 @@ function migrateIfNeeded(newOpenid) {
 // ---------- 协议同意门（consent gate）----------
 const CONSENT_KEY = 'consent_agreed';
 const CONSENT_VERSION = 1;
+const TEMP_OPENID = 'TMP_TEMP_ACCOUNT'; // 固定临时账户 ID
 
 function hasAgreedConsent() {
   const v = wx.getStorageSync(CONSENT_KEY);
@@ -80,6 +82,11 @@ function hasAgreedConsent() {
 
 function markAgreedConsent() {
   wx.setStorageSync(CONSENT_KEY, { version: CONSENT_VERSION, at: Date.now() });
+}
+
+// 是否为临时账户（未同意协议，云端读写全部跳过）
+function isTempUser() {
+  return state.openid === TEMP_OPENID;
 }
 
 // 用户点"同意"后，跳过 init 缓存，立即换取正式 openid 并迁移本地数据
@@ -120,13 +127,15 @@ async function init() {
   if (state.readyPromise) return state.readyPromise;
   state.today = todayStr();
   state.readyPromise = (async () => {
-    // 强制同意：未同意协议则抛出异常，阻止后续业务初始化
     if (!hasAgreedConsent()) {
-      throw new Error('CONSENT_REQUIRED');
+      // 未同意协议 → 固定临时账户，不调用云函数，不采集任何身份信息
+      state.openid = TEMP_OPENID;
+    } else {
+      // 已同意 → 正常走云登录获取正式 openid
+      const res = await api.login();
+      state.openid = res.openid;
+      migrateIfNeeded(res.openid);
     }
-    const res = await api.login();
-    state.openid = res.openid;
-    migrateIfNeeded(res.openid);
     setPrefix(state.openid);
     state.library = storage.get(K.library, []);
     state.monthMarks = storage.get(K.monthMarks, {});
@@ -135,9 +144,11 @@ async function init() {
     state.pendingActions = storage.get(K.pendingActions, []);
     state.ready = true;
     notify();
-    // 后台刷新动作库 + 重试待同步数据
-    refreshLibrary();
-    retryAll('launch');
+    // 临时账户不做云端操作
+    if (!isTempUser()) {
+      refreshLibrary();
+      retryAll('launch');
+    }
   })();
   return state.readyPromise;
 }
@@ -321,6 +332,7 @@ function buildRecordPayload(record) {
 
 // 推送整日记录，成功返回 true，失败标记待同步
 async function pushRecord(record) {
+  if (isTempUser()) return false; // 临时账户不写云端
   try {
     await api.record.save(buildRecordPayload(record));
     clearPendingDate(record.date);
@@ -337,6 +349,7 @@ async function pushRecord(record) {
 }
 
 async function pushDeleteDay(dailyRecordId, date) {
+  if (isTempUser()) return false; // 临时账户不写云端
   try {
     await api.record.remove(dailyRecordId);
     return true;
@@ -351,6 +364,7 @@ async function pushDeleteDay(dailyRecordId, date) {
 // 启动/网络恢复时执行：删除队列 → 动作操作队列 → 记录推送队列
 async function retryAll() {
   if (state.syncing || !state.ready) return;
+  if (isTempUser()) return; // 临时账户不触发同步
   state.syncing = true;
   try {
     // 整日删除
@@ -454,6 +468,7 @@ module.exports = {
   markAgreedConsent,
   loginAfterConsent,
   resetForConsent,
+  isTempUser,
   // 动作库
   getLibrary,
   findAction,

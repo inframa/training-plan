@@ -43,15 +43,15 @@ Page({
     });
     const patch = {
       openid: openid || '',
-      isLocalUser: openid ? openid.indexOf('local-') === 0 : false,
+      isLocalUser: store.isTempUser() || (openid ? openid.indexOf('local-') === 0 : false),
       trainingDays,
       totalVolume: totalVol.toLocaleString(),
-      syncStatus: store.state.pendingDates ? ('待同步 ' + store.state.pendingDates.length + ' 条') : '已同步',
+      syncStatus: store.state.pendingDates ? ('待同步 ' + store.state.pendingDates.length + ' 条') : (store.isTempUser() ? '临时账户（不云端同步）' : '已同步'),
       lastLogin: dateUtil.todayStr(),
       consentAgreed: store.hasAgreedConsent()
     };
     // 读取用户头像
-    if (openid && openid.indexOf('local-') !== 0) {
+    if (openid && !store.isTempUser() && openid.indexOf('local-') !== 0) {
       try {
         const db = wx.cloud.database();
         const res = await db.collection('user').where({ _openid: openid }).limit(1).get();
