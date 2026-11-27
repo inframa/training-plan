@@ -25,14 +25,17 @@ Page({
       today: dateUtil.todayStr()
     });
     this.unsub = store.subscribe(() => this.refreshMarks());
+
+    // 第一优先级：未同意协议 → 直接弹，不经过 store（最可靠，不依赖 promise 链路）
+    if (!store.hasAgreedConsent()) {
+      this.setData({ showConsent: true });
+      return;
+    }
+
+    // 已同意 → 正常初始化
     store.ready().then(() => {
       this.refreshMarks();
       this.fetchMonth();
-    }).catch((err) => {
-      // CONSENT_REQUIRED → 强制弹协议同意窗
-      if (err && err.message === 'CONSENT_REQUIRED') {
-        this.setData({ showConsent: true });
-      }
     });
   },
 
