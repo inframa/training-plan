@@ -163,9 +163,24 @@ Page({
     if (this.data.consentAgreed) {
       wx.showModal({
         title: '已同意协议',
-        content: '您已同意过协议。如需重新同意或撤回，请清除本地缓存后重新启动小程序。',
+        content: '您已同意过协议。撤回后下次打开小程序将重新弹出同意窗口，且不会以正式身份登录。确定撤回吗？',
+        confirmText: '撤回同意',
+        confirmColor: '#e64340',
+        cancelText: '再想想',
+        success: (res) => {
+          if (res.confirm) {
+            wx.removeStorageSync('consent_agreed');
+            this.setData({ consentAgreed: false });
+            wx.showToast({ title: '已撤回，重启生效', icon: 'none', duration: 2000 });
+          }
+        }
+      });
+    } else {
+      wx.showModal({
+        title: '尚未同意',
+        content: '您尚未同意用户服务协议和隐私政策。请返回首页完成同意后即可正常使用。',
         showCancel: false,
-        confirmText: '知道了'
+        confirmText: '好的'
       });
     }
   },
