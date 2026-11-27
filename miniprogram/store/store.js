@@ -82,6 +82,39 @@ function markAgreedConsent() {
   wx.setStorageSync(CONSENT_KEY, { version: CONSENT_VERSION, at: Date.now() });
 }
 
+// 用户点"同意"后，跳过 init 缓存，立即换取正式 openid 并迁移本地数据
+async function loginAfterConsent() {
+  try {
+    const res = await api.login();
+    const newOpenid = res.openid;
+    const oldOpenid = state.openid;
+    if (oldOpenid !== newOpenid) {
+      // 迁移本地数据前缀
+      const oldPrefix = 'u_' + oldOpenid + '_';
+      const newPrefix = 'u_' + newOpenid + '_';
+      storage.allKeys().forEach((key) => {
+        if (key.indexOf(oldPrefix) === 0) {
+          const val = wx.getStorageSync(key);
+          wx.setStorageSync(newPrefix + key.slice(oldPrefix.length), val);
+          wx.removeStorageSync(key);
+        }
+      });
+      migrateIfNeeded(newOpenid);
+    }
+    state.openid = newOpenid;
+    setPrefix(newOpenid);
+    wx.setStorageSync('last_openid', newOpenid);
+    // 刷新动作库 + 触发同步
+    await refreshLibrary();
+    retryAll('loginAfterConsent');
+    notify();
+    return true;
+  } catch (e) {
+    console.error('loginAfterConsent 失败:', e);
+    return false;
+  }
+}
+
 // ---------- 初始化 ----------
 async function init() {
   if (state.readyPromise) return state.readyPromise;
@@ -423,6 +456,7 @@ module.exports = {
   // 协议同意门
   hasAgreedConsent,
   markAgreedConsent,
+  loginAfterConsent,
   // 动作库
   getLibrary,
   findAction,

@@ -110,18 +110,18 @@ Page({
   },
 
   // ---------- 协议同意 ----------
-  onAgreeConsent() {
+  async onAgreeConsent() {
     store.markAgreedConsent();
     this.setData({ showConsent: false });
-    // 同意后重新走云登录流程，获取正式 openid
     wx.showLoading({ title: '登录中…' });
-    store.ready().then(async () => {
-      try {
-        await store.init(); // init 有缓存，不会重复执行
-      } catch (e) { /* ignore */ }
-      wx.hideLoading();
+    const ok = await store.loginAfterConsent();
+    wx.hideLoading();
+    if (ok) {
       wx.showToast({ title: '欢迎使用！', icon: 'success' });
-    });
+      this.refreshMarks();
+    } else {
+      wx.showToast({ title: '登录失败，请检查网络', icon: 'none' });
+    }
   },
 
   onDisagreeConsent() {

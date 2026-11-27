@@ -80,6 +80,11 @@
       <text>协议同意状态</text>
       <text class="mine-sync {{consentAgreed ? 'ok' : 'pending'}}">{{consentAgreed ? '已同意' : '未同意'}}</text>
     </view>
+    <!-- 紧急修复：已同意协议但仍是本地临时用户时显示手动登录按钮 -->
+    <view wx:if="{{isLocalUser && consentAgreed}}" class="mine-row row between" bindtap="onManualLogin">
+      <text class="mine-sync pending">⚠️ 本地临时用户，点击登录获取正式身份</text>
+      <text class="muted">›</text>
+    </view>
   </view>
 
   <view class="card">

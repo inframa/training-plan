@@ -168,5 +168,22 @@ Page({
         confirmText: '知道了'
       });
     }
+  },
+
+  // 手动登录：已同意协议但仍为本地临时用户时使用
+  async onManualLogin() {
+    if (!this.data.consentAgreed) {
+      wx.showToast({ title: '请先在首页同意协议', icon: 'none' });
+      return;
+    }
+    wx.showLoading({ title: '登录中…' });
+    const ok = await store.loginAfterConsent();
+    wx.hideLoading();
+    if (ok) {
+      wx.showToast({ title: '登录成功', icon: 'success' });
+      this.refresh();
+    } else {
+      wx.showToast({ title: '登录失败，请检查网络', icon: 'none' });
+    }
   }
 });
