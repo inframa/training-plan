@@ -11,11 +11,15 @@ App({
       traceUser: true
       // 不传 env 时使用默认云环境；如有多环境需求，在此填入环境 ID
     });
-    // 登录 + 本地缓存恢复 + 待同步数据重试
-    store.init();
+    // 登录 + 本地缓存恢复 + 待同步数据重试（未同意协议时会抛 CONSENT_REQUIRED，由各页面弹窗处理）
+    store.init().catch((err) => {
+      if (err && err.message !== 'CONSENT_REQUIRED') {
+        console.error('store.init 异常:', err);
+      }
+    });
     // 网络恢复时自动重试未同步数据（整日记录按日期增量推送）
     wx.onNetworkStatusChange((res) => {
-      if (res.isConnected) store.retryAll('network');
+      if (res.isConnected && store.isReady()) store.retryAll('network');
     });
   }
 });

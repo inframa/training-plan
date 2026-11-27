@@ -28,8 +28,9 @@ Page({
     store.ready().then(() => {
       this.refreshMarks();
       this.fetchMonth();
-      // 检查是否需要展示协议同意弹窗
-      if (!store.hasAgreedConsent()) {
+    }).catch((err) => {
+      // CONSENT_REQUIRED → 强制弹协议同意窗
+      if (err && err.message === 'CONSENT_REQUIRED') {
         this.setData({ showConsent: true });
       }
     });
@@ -109,30 +110,40 @@ Page({
     wx.showToast({ title: '未来日期暂不支持录入', icon: 'none' });
   },
 
-  // ---------- 协议同意 ----------
+  // ---------- 协议同意（强制模式）----------
   async onAgreeConsent() {
     store.markAgreedConsent();
     this.setData({ showConsent: false });
-    wx.showLoading({ title: '登录中…' });
-    const ok = await store.loginAfterConsent();
-    wx.hideLoading();
-    if (ok) {
-      wx.showToast({ title: '欢迎使用！', icon: 'success' });
+    wx.showLoading({ title: '注册登录中…' });
+    // 清除 init 缓存，让 store 重新走云登录流程
+    store.resetForConsent();
+    try {
+      await store.ready();
+      wx.hideLoading();
+      wx.showToast({ title: '注册成功！', icon: 'success' });
       this.refreshMarks();
-    } else {
-      wx.showToast({ title: '登录失败，请检查网络', icon: 'none' });
+      this.fetchMonth();
+    } catch (e) {
+      wx.hideLoading();
+      wx.showModal({
+        title: '登录失败',
+        content: '网络异常导致无法完成注册，请检查网络后重新打开小程序。',
+        showCancel: false,
+        confirmText: '退出'
+      });
     }
   },
 
   onDisagreeConsent() {
     wx.showModal({
-      title: '暂不同意',
-      content: '不同意协议将无法使用云同步、头像上传等功能，仅可本地使用训练记录。确定继续？',
-      confirmText: '继续本地使用',
+      title: '退出小程序',
+      content: '不同意协议将无法使用本小程序。您可以查看协议内容后再做决定，或直接退出。',
+      confirmText: '退出小程序',
       cancelText: '再看看',
       success: (res) => {
         if (res.confirm) {
-          this.setData({ showConsent: false });
+          // 用户确认退出
+          wx.exitMiniProgram({ fail: () => { /* 兜底 */ } });
         }
       }
     });

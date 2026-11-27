@@ -120,22 +120,13 @@ async function init() {
   if (state.readyPromise) return state.readyPromise;
   state.today = todayStr();
   state.readyPromise = (async () => {
-    // 协议同意门：未同意则跳过云登录，仅用本地临时 ID
-    if (hasAgreedConsent()) {
-      try {
-        const res = await api.login();
-        state.openid = res.openid;
-        migrateIfNeeded(res.openid);
-      } catch (e) {
-        // 离线兜底：使用本地临时 ID
-        state.openid = wx.getStorageSync('local_openid') || 'local-' + Date.now();
-        wx.setStorageSync('local_openid', state.openid);
-      }
-    } else {
-      // 未同意：仅使用本地临时 ID，不采集任何身份信息
-      state.openid = wx.getStorageSync('local_openid') || 'local-' + Date.now();
-      wx.setStorageSync('local_openid', state.openid);
+    // 强制同意：未同意协议则抛出异常，阻止后续业务初始化
+    if (!hasAgreedConsent()) {
+      throw new Error('CONSENT_REQUIRED');
     }
+    const res = await api.login();
+    state.openid = res.openid;
+    migrateIfNeeded(res.openid);
     setPrefix(state.openid);
     state.library = storage.get(K.library, []);
     state.monthMarks = storage.get(K.monthMarks, {});
@@ -153,6 +144,11 @@ async function init() {
 
 function ready() {
   return state.readyPromise || init();
+}
+
+// 用户同意协议后调用：清除 init 缓存，让下次 ready() 重新走完整云登录流程
+function resetForConsent() {
+  state.readyPromise = null;
 }
 
 // ---------- 动作库 ----------
@@ -457,6 +453,7 @@ module.exports = {
   hasAgreedConsent,
   markAgreedConsent,
   loginAfterConsent,
+  resetForConsent,
   // 动作库
   getLibrary,
   findAction,

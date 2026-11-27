@@ -41,7 +41,7 @@
       <view class="consent-desc consent-desc-detail">同意后，我们将获取您的微信身份标识（openid）用于数据存储与同步，不会收集其他敏感信息。</view>
       <view class="consent-btns">
         <button class="consent-btn-primary" bindtap="onAgreeConsent">我已阅读并同意</button>
-        <button class="consent-btn-secondary" bindtap="onDisagreeConsent">暂不同意</button>
+        <button class="consent-btn-secondary" bindtap="onDisagreeConsent">不同意并退出</button>
       </view>
     </view>
   </view>
