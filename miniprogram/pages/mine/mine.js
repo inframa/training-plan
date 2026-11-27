@@ -7,6 +7,7 @@ Page({
   data: {
     openid: '',
     avatarUrl: '',
+    nickname: '',        // 微信昵称（input type=nickname 自动填充）
     trainingDays: 0,
     totalVolume: '0',
     syncStatus: '',
@@ -50,17 +51,40 @@ Page({
       lastLogin: dateUtil.todayStr(),
       consentAgreed: store.hasAgreedConsent()
     };
-    // 读取用户头像
+    // 读取用户资料（头像 + 昵称）
     if (openid && !store.isTempUser() && openid.indexOf('local-') !== 0) {
       try {
         const db = wx.cloud.database();
         const res = await db.collection('user').where({ _openid: openid }).limit(1).get();
-        if (res.data && res.data[0] && res.data[0].avatar) {
-          patch.avatarUrl = res.data[0].avatar;
+        if (res.data && res.data[0]) {
+          if (res.data[0].avatar) patch.avatarUrl = res.data[0].avatar;
+          if (res.data[0].nickname) patch.nickname = res.data[0].nickname;
         }
       } catch (e) { /* 忽略 */ }
     }
+    // 临时用户：从本地 storage 读取昵称（纯本地保存）
+    if (!patch.nickname) {
+      const local = wx.getStorageSync('local_nickname');
+      if (local) patch.nickname = local;
+    }
     this.setData(patch);
+  },
+
+  // 昵称输入：临时用户存本地，已登录用户存云端
+  onNicknameInput(e) {
+    const val = (e.detail.value || '').trim();
+    if (!val) return;
+    this.setData({ nickname: val });
+    if (this.data.isLocalUser || store.isTempUser()) {
+      // 临时用户 → 仅本地保存
+      wx.setStorageSync('local_nickname', val);
+    } else {
+      // 已登录 → 云端保存
+      wx.cloud.callFunction({
+        name: 'login',
+        data: { action: 'updateProfile', payload: { nickname: val } }
+      }).catch(() => {}); // 静默失败，下次重试
+    }
   },
 
   async onChooseAvatar(e) {
@@ -185,19 +209,55 @@ Page({
     }
   },
 
-  // 手动登录：已同意协议但仍为本地临时用户时使用
+  // 主动登录：未同意协议 → 先弹协议同意框 → 同意后走注册；已同意 → 直接走云登录
   async onManualLogin() {
-    if (!this.data.consentAgreed) {
-      wx.showToast({ title: '请先在首页同意协议', icon: 'none' });
-      return;
-    }
-    wx.showLoading({ title: '登录中…' });
-    const ok = await store.loginAfterConsent();
-    wx.hideLoading();
-    if (ok) {
-      wx.showToast({ title: '登录成功', icon: 'success' });
-      this.refresh();
+    if (!store.hasAgreedConsent()) {
+      // 未同意 → 引导同意
+      wx.showModal({
+        title: '请先同意协议',
+        content: '使用完整功能需要同意《用户服务协议》和《隐私政策》。同意后将自动为您注册账号。',
+        confirmText: '同意并登录',
+        confirmColor: '#07c160',
+        cancelText: '不同意',
+        success: async (res) => {
+          if (!res.confirm) {
+            wx.showToast({ title: '您仍可匿名使用', icon: 'none' });
+            return;
+          }
+          store.markAgreedConsent();
+          this.setData({ consentAgreed: true });
+          await this._doLoginAfterAgree();
+        }
+      });
     } else {
+      await this._doLoginAfterAgree();
+    }
+  },
+
+  // 内部：同意后实际执行云登录 + 迁移本地昵称到云端
+  async _doLoginAfterAgree() {
+    wx.showLoading({ title: '注册登录中…' });
+    store.resetForConsent();
+    try {
+      await store.ready();
+      wx.hideLoading();
+      if (store.isTempUser()) {
+        wx.showToast({ title: '网络异常，暂以访客模式使用', icon: 'none', duration: 2500 });
+        return;
+      }
+      // 登录成功 → 把之前本地保存的昵称迁移到云端
+      const localNickname = wx.getStorageSync('local_nickname');
+      if (localNickname) {
+        this.setData({ nickname: localNickname });
+        wx.cloud.callFunction({
+          name: 'login',
+          data: { action: 'updateProfile', payload: { nickname: localNickname } }
+        }).then(() => wx.removeStorageSync('local_nickname')).catch(() => {});
+      }
+      wx.showToast({ title: '登录成功！', icon: 'success' });
+      this.refresh();
+    } catch (e) {
+      wx.hideLoading();
       wx.showToast({ title: '登录失败，请检查网络', icon: 'none' });
     }
   }

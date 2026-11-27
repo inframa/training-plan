@@ -12,7 +12,7 @@ exports.main = async (event) => {
   }
 
   if (action === 'updateProfile') {
-    const allowed = ['avatar']; // 允许更新的字段白名单
+    const allowed = ['avatar', 'nickname']; // 允许更新的字段白名单
     const data = {};
     allowed.forEach((k) => {
       if (payload[k] !== undefined && payload[k] !== null) data[k] = payload[k];

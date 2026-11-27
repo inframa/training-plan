@@ -7,13 +7,27 @@
       <view wx:else class="mine-avatar">我</view>
     </button>
     <view class="mine-user-info">
-      <view class="h2">健身爱好者</view>
+      <!-- 昵称：input type="nickname" 自动取微信昵称（未同意协议时也能用，纯本地） -->
+      <input
+        class="mine-nickname-input"
+        type="nickname"
+        placeholder="点击填写昵称"
+        value="{{nickname}}"
+        bindblur="onNicknameInput"
+      />
       <view wx:if="{{isLocalUser}}" class="muted">本地临时用户（未登录）</view>
       <view wx:else class="mine-openid-row">
         <text class="muted" style="word-break:break-all">openid：{{openid || '加载中…'}}</text>
         <text class="mine-copy-btn" bindtap="onCopyOpenid">复制</text>
       </view>
     </view>
+  </view>
+
+  <!-- 未同意协议：主动登录按钮 -->
+  <view wx:if="{{!consentAgreed}}" class="card mine-login-prompt">
+    <view class="mine-login-title">🔐 尚未登录</view>
+    <view class="muted" style="margin-bottom:24rpx">您正在以临时身份使用，训练数据仅保存在本地。登录后数据将同步到云端，换设备也能找回。</view>
+    <button class="btn primary" bindtap="onManualLogin">同意协议并登录</button>
   </view>
 
   <!-- 训练统计 -->
@@ -80,9 +94,9 @@
       <text>协议同意状态</text>
       <text class="mine-sync {{consentAgreed ? 'ok' : 'pending'}}">{{consentAgreed ? '已同意' : '未同意'}}</text>
     </view>
-    <!-- 紧急修复：已同意协议但仍是本地临时用户时显示手动登录按钮 -->
+    <!-- 已同意但临时账户（云登录曾失败）→ 也可以主动重试登录 -->
     <view wx:if="{{isLocalUser && consentAgreed}}" class="mine-row row between" bindtap="onManualLogin">
-      <text class="mine-sync pending">⚠️ 本地临时用户，点击登录获取正式身份</text>
+      <text class="mine-sync pending">⚠️ 临时账户，点击重新登录</text>
       <text class="muted">›</text>
     </view>
   </view>
