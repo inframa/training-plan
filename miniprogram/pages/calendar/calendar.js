@@ -25,14 +25,11 @@ Page({
       today: dateUtil.todayStr()
     });
     this.unsub = store.subscribe(() => this.refreshMarks());
-
-    // store.init() 不管同意与否都会成功（同意=正式用户, 不同意=临时账户）
     store.ready().then(() => {
       this.refreshMarks();
       this.fetchMonth();
     });
-
-    // 未同意协议 → 弹提示窗，告知临时账户模式（用户可随时回来同意注册）
+    // 首次进入：未同意 → 弹窗
     if (!store.hasAgreedConsent()) {
       this.setData({ showConsent: true });
     }
@@ -45,6 +42,10 @@ Page({
   onShow() {
     this.setData({ today: dateUtil.todayStr() });
     if (store.isReady()) this.refreshMarks();
+    // 每次切回前台也检查（防止从其他页面返回时弹窗被关掉）
+    if (!store.hasAgreedConsent()) {
+      this.setData({ showConsent: true });
+    }
   },
 
   refreshMarks() {
