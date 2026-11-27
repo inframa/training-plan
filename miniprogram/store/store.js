@@ -131,10 +131,16 @@ async function init() {
       // 未同意协议 → 固定临时账户，不调用云函数，不采集任何身份信息
       state.openid = TEMP_OPENID;
     } else {
-      // 已同意 → 正常走云登录获取正式 openid
-      const res = await api.login();
-      state.openid = res.openid;
-      migrateIfNeeded(res.openid);
+      // 已同意 → 尝试云登录获取正式 openid；失败则降级为临时账户（保留同意标记）
+      try {
+        const res = await api.login();
+        state.openid = res.openid;
+        migrateIfNeeded(res.openid);
+      } catch (e) {
+        console.warn('云登录失败，降级为临时账户:', e);
+        state.openid = TEMP_OPENID;
+        wx.showToast({ title: '网络异常，暂以访客模式使用', icon: 'none', duration: 2500 });
+      }
     }
     setPrefix(state.openid);
     state.library = storage.get(K.library, []);

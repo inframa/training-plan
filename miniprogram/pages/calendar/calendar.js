@@ -119,23 +119,17 @@ Page({
     store.markAgreedConsent();
     this.setData({ showConsent: false });
     wx.showLoading({ title: '注册登录中…' });
-    // 清除 init 缓存，让 store 重新走云登录流程
     store.resetForConsent();
-    try {
-      await store.ready();
-      wx.hideLoading();
+    await store.ready(); // 内部已兜底：云登录失败降级为临时账户，不会抛异常
+    wx.hideLoading();
+    if (store.isTempUser()) {
+      // 云登录失败，降级临时账户
+      wx.showToast({ title: '网络异常，暂以访客模式使用', icon: 'none', duration: 2500 });
+    } else {
       wx.showToast({ title: '注册成功！', icon: 'success' });
-      this.refreshMarks();
-      this.fetchMonth();
-    } catch (e) {
-      wx.hideLoading();
-      wx.showModal({
-        title: '登录失败',
-        content: '网络异常导致无法完成注册，请检查网络后重新打开小程序。',
-        showCancel: false,
-        confirmText: '退出'
-      });
     }
+    this.refreshMarks();
+    this.fetchMonth();
   },
 
   onDisagreeConsent() {
